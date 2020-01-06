@@ -1,8 +1,8 @@
-
+import unittest
 
 def AssemblyStiffnessMatrix(linearSystem, grid, props, uShift):
 	for e in grid.getElements():
-        dx = e.getLength()
+		dx = e.getLength()
         f = e.getFace()
         A = f.getArea()
         backVertex = f.getBackwardVertex()
@@ -19,20 +19,20 @@ def AssemblyStiffnessMatrix(linearSystem, grid, props, uShift):
             linearSystem.addValueToMatrix( fIndex, vIndex, -flux )
             localIndex += 1
 
-def AssemblyPorePressureToGeoMatrix(linearSystem, grid, props, uShift, pShift):
+def AssemblyPorePressureToGeoMatrix(linearSystem, grid, props, uShift):
 	for e in grid.getElements():
-        f = e.getFace()
+		f = e.getFace()
         A = f.getArea()
         backVertex = f.getBackwardVertex()
         forVertex = f.getForwardVertex()
-        bIndex = backVertex.getIndex() + grid.getNumberOfVertices()
-        fIndex = forVertex.getIndex() + grid.getNumberOfVertices()
+        bIndex = backVertex.getIndex() + uShift*grid.getNumberOfVertices()
+        fIndex = forVertex.getIndex() + uShift*grid.getNumberOfVertices()
         operator = [props.biot*A/2., props.biot*A/2.]
         localIndex = 0
         for v in e.getVertices():
             flux = operator[localIndex]
-            vIndex = v.getIndex()
+            vIndex = v.getIndex() + (1-uShift)*grid.getNumberOfVertices()
             ls.addValueToMatrix( bIndex, vIndex, flux )
             ls.addValueToMatrix( fIndex, vIndex, -flux )
             localIndex += 1
-    ls.addValueToMatrix( 2*nv-1, nv-1, 2*biot*A )
+	ls.addValueToMatrix( 2*nv-1, nv-1, 2*biot*A )
