@@ -1,0 +1,8 @@
+FluidProperties OneFluid{
+	Compressibility 3.030303030303030303030303030E-10
+	Viscosity 1.002E-03
+}
+
+Compressibility 3.030303030303030303030303030E-10
+Viscosity 0.001
+4.4E-10

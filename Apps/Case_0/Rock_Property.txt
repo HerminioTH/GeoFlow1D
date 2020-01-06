@@ -1,0 +1,54 @@
+RockProperties 1{
+	Compressibility		2.7777777777777777778E-11
+	Biot		 	0.777777777777777778
+	
+	Undrained_Poisson 	0.20
+	Drained_Poisson		0.20
+	Shear_Modulus 		6E+09
+	
+	Porosity		0.19
+	Permeability		1.9E-13
+}
+
+RockProperties 2{
+	Compressibility		2.7777777777777777778E-11
+	Biot		 	0.777777777777777778
+	
+	Undrained_Poisson 	0.20
+	Drained_Poisson		0.20
+	Shear_Modulus 		6E+09
+	
+	Porosity		0.19
+	Permeability		1.9E-13
+}
+
+RockProperties 3{
+	Compressibility		0.0
+	Biot		 	1.0
+	
+	Undrained_Poisson 	0.25
+	Drained_Poisson		0.25
+	Shear_Modulus 		40.0E+06
+	
+	Porosity		0.375
+	Permeability		1.0224489795918365E-15
+}
+
+
+
+
+
+
+
+
+RockProperties 3{
+	Compressibility		2.7777777777777777778E-11
+	Biot		 	0.777777777777777778
+	
+	Undrained_Poisson 	0.20
+	Drained_Poisson		0.20
+	Shear_Modulus 		6E+09
+	
+	Porosity		0.19
+	Permeability		1.9E-15
+}
