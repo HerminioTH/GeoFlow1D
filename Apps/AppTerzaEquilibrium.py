@@ -1,10 +1,16 @@
 # -*- coding: cp1252 -*-
+import os
+from PathHandleLib import *
+print os.getcwd()
+
 from FieldsLib import *
 from GridLib import *
 from LinearSystem import *
 from PropertyParser import Properties
+import GeoLib
 import numpy as np
 import matplotlib.pylab as plt
+
 
 def pEqui( stress, height, c_f, c_s, phi, ni, G, alpha ):
     Lambda = 2*G*ni/(1-2*ni)
@@ -45,13 +51,13 @@ def plotMatrix( matrix ):
     plt.show()
 
 ## -------------------------- GRID --------------------------
-def createGridData( L, numberOfNodes ):
-    nodesCoord = np.linspace( 0, L, nv )
-    elemConn = np.zeros((numberOfNodes-1,2))
-    for i in range( numberOfNodes-1 ):
-        elemConn[i][0] = i
-        elemConn[i][1] = i+1
-    return nodesCoord, elemConn
+# def createGridData( L, numberOfNodes ):
+#     nodesCoord = np.linspace( 0, L, nv )
+#     elemConn = np.zeros((numberOfNodes-1,2))
+#     for i in range( numberOfNodes-1 ):
+#         elemConn[i][0] = i
+#         elemConn[i][1] = i+1
+#     return nodesCoord, elemConn
 
 stress = -1e4
 nv = 4
@@ -61,6 +67,8 @@ nodesCoord, elemConn = createGridData( L, nv )
 gridData = GridData()
 gridData.setElementConnectivity( elemConn )
 gridData.setNodeCoordinates( nodesCoord )
+
+print nodesCoord
 
 g = Grid_1D( gridData )
 ## -------------------------------------------------------------------
