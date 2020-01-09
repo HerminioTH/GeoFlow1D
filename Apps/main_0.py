@@ -40,6 +40,8 @@ rock = Properties( case + "solid.json" )
 fluid = Properties( case + "fluid.json" )
 time = Properties( case + "NumericalSettings.json" )
 
+
+
 # dt = time.getMaterialProperty("Time_Step")
 
 # viscosity = fluid.getMaterialProperty("Viscosity")
