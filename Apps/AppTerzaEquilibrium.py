@@ -1,8 +1,4 @@
 # -*- coding: cp1252 -*-
-import os
-from PathHandleLib import *
-print os.getcwd()
-
 from FieldsLib import *
 from GridLib import *
 from LinearSystem import *
@@ -24,8 +20,8 @@ def uEqui( stress, height, c_f, c_s, phi, ni, G, alpha ):
     lame = 2*G*ni/(1-2*ni)
     Beta = lame*(1-ni)/ni + alpha*alpha/Psi
     return stress*height/Beta
-    
-    
+
+
 
 def plotMatrix( matrix ):
     n = matrix.shape[0]/2
@@ -77,7 +73,7 @@ g = Grid_1D( gridData )
 
 
 ## -------------------------- SCALAR FIELDS --------------------------
-case = "\\Case_0\\"
+case = "Case_0\\"
 rock = Properties( case + "Rock_Properties.txt" )
 fluid = Properties( case + "Fluid_Properties.txt" )
 time = Properties( case + "Numerical_Properties.txt" )

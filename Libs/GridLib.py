@@ -4,96 +4,109 @@ class GridData( object ):
     def __init__( self ):
         self.elemConnectivity = []
         self.nodeCoordinates = []
+        self.regionElements = []
 
-    def setElementConnectivity( self, elemConnectivity ):
+    def setElementConnectivity(self, elemConnectivity):
         self.elemConnectivity = elemConnectivity
+        if len(self.regionElements) == 0:
+            self.regionElements = self.elemConnectivity
+            self.regionNames = 'None'
 
-    def setNodeCoordinates( self, nodeCoordinates ):
+    def setNodeCoordinates(self, nodeCoordinates):
         self.nodeCoordinates = nodeCoordinates
 
+    def setElementsToRegions(self, regionElements, regionNames):
+        self.regionElements = regionElements
+        self.regionNames = regionNames
+
 class Vertex( object ):
-    def __init__( self, index, coord ):
+    def __init__(self, index, coord):
         self.__globalIndex = index
         self.__x = coord
         self.__volume = 0.0
 
-    def getIndex( self ):
+    def getIndex(self):
         return self.__globalIndex
-    
-    def getCoordinate( self ):
+
+    def getCoordinate(self):
         return self.__x
 
-    def addToVolume( self, value ):
+    def addToVolume(self, value):
         self.__volume += value
 
-    def getVolume( self ):
+    def getVolume(self):
         return self.__volume
 
-    
 
-class Face( object ):
-    def __init__( self, vertices, height=1.0 ):
+
+class Face(object):
+    def __init__(self, vertices, height=1.0):
         self.__bVertex = vertices[0]
         self.__fVertex = vertices[1]
         self.__faceCoord = ( vertices[0].getCoordinate() + vertices[1].getCoordinate() ) / 2.0
         self.__area = height
 
-    def getBackwardVertex( self ):
+    def getBackwardVertex(self):
         return self.__bVertex
 
-    def getForwardVertex( self ):
+    def getForwardVertex(self):
         return self.__fVertex
 
-    def getCoordinate( self ):
+    def getCoordinate(self):
         return self.__faceCoord
 
-    def getArea( self ):
+    def getArea(self):
         return self.__area
-    
 
-class Element( object ):
-    def __init__( self, vertices, index, height=1.0 ):
+
+class Element(object):
+    def __init__(self, vertices, index, height=1.0):
         self.__globalIndex = index
         self.__height = height
         self.__vertices = vertices
         self.__buildFace()
         self.__elementLength = self.__vertices[1].getCoordinate() - self.__vertices[0].getCoordinate()
 
-    def __buildFace( self ):
-        self.__face = Face( self.__vertices )
+    def __buildFace(self):
+        self.__face = Face(self.__vertices)
 
-    def getIndex( self ):
+    def getIndex(self):
         return self.__globalIndex
 
-    def getVertices( self ):
+    def getVertices(self):
         return self.__vertices
 
-    def getFace( self ):
+    def getFace(self):
         return self.__face
 
-    def getLength( self ):
+    def getLength(self):
         return self.__elementLength
 
-    def getHeight( self ):
+    def getHeight(self):
         return self.__height
+
+
+# class Region(object):
+#     def __init__(self, elements, )
 
 
 class Grid_1D( object ):
     def __init__( self, gridData ):
         self.__buildVertices( gridData )
         self.__buildElements( gridData )
+        self.__buildRegions( gridData )
         self.__computeVolumes()
 
     def __buildVertices( self, gridData ):
         self.__vertices = []
-        iVertices = []        
+        iVertices = []
         for iElem in gridData.elemConnectivity:
             for iVertex in iElem:
                 if iVertices.count( iVertex ) == 0:
                     iVertices.append( iVertex )
                     self.__vertices.append( Vertex( iVertex, gridData.nodeCoordinates[iVertex] ) )
-        self.__numberOfVertices = len( self.__vertices )
-                
+        self.__numberOfVertices = len(self.__vertices)
+
 
     def __buildElements( self, gridData ):
         self.__elements = []
@@ -101,11 +114,10 @@ class Grid_1D( object ):
         for i, iElem in enumerate(gridData.elemConnectivity):
             self.__elements.append( Element( [ self.__vertices[iElem[0]], self.__vertices[iElem[1]] ], i ) )
             self.__nElements += 1
-            
 
     def getVertices( self ):
         return self.__vertices
-            
+
     def getElements( self ):
         return self.__elements
 
