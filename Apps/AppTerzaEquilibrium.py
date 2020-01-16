@@ -24,8 +24,7 @@ def uEqui( stress, height, c_f, c_s, phi, ni, G, alpha ):
     lame = 2*G*ni/(1-2*ni)
     Beta = lame*(1-ni)/ni + alpha*alpha/Psi
     return stress*height/Beta
-    
-    
+
 
 def plotMatrix( matrix ):
     n = matrix.shape[0]/2
@@ -177,7 +176,7 @@ def AssemblyPressureEquation():
 
 
 ## ----------------------- ELASTICITY EQUATION -----------------------
-def AssemblyElasticityEquation():    
+def AssemblyElasticityEquation():
     '''Forces'''
     for e in g.getElements():
         dx = e.getLength()
