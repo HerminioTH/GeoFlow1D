@@ -135,7 +135,6 @@ class Grid_1D( object ):
         for regionIndex in range(self.__numberOfRegions):
             regionName = gridData.regionNames[regionIndex]
             region = Region(regionName, regionIndex)
-            print gridData.regionElements[0]
             for iElem in gridData.regionElements[regionIndex]:
                 e = Element( [ self.__vertices[iElem[0]], self.__vertices[iElem[1]] ], elementIndex )
                 region.addElement(e)
@@ -220,8 +219,8 @@ if __name__ == '__main__':
             R1.append(e)
         elif x > L_0:
             R2.append(e)
-    elemOnRegion1 = gridData.elemConnectivity[R1[0]:R1[-1]]
-    elemOnRegion2 = gridData.elemConnectivity[R2[0]:R2[-1]]
+    elemOnRegion1 = gridData.elemConnectivity[R1[0]:R1[-1]+1]
+    elemOnRegion2 = gridData.elemConnectivity[R2[0]:R2[-1]+1]
     gridData.setElementsToRegions([elemOnRegion1, elemOnRegion2], namesOfRegions)
     print gridData.regionElements
     # print gridData.regionNames
