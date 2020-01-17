@@ -9,16 +9,19 @@ class GridData( object ):
 
     def setElementConnectivity(self, elemConnectivity):
         self.elemConnectivity = elemConnectivity
-        if len(self.regionElements) == 0:
-            self.regionElements = [self.elemConnectivity]
-            self.regionNames = ['None']
 
     def setNodeCoordinates(self, nodeCoordinates):
         self.nodeCoordinates = nodeCoordinates
 
-    def setElementsToRegions(self, regionElements, regionNames):
-        self.regionElements = regionElements
-        self.regionNames = regionNames
+    def setElementsToRegion(self, regionElements, regionName):
+        self.regionElements.append(regionElements)
+        self.regionNames.append(regionName)
+
+    def initialize(self):
+        if len(self.regionElements) == 0:
+            self.regionElements.append(range(len(self.elemConnectivity)))
+            self.regionNames = ['None']
+
 
 class Vertex( object ):
     def __init__(self, index, coord):
@@ -111,8 +114,9 @@ class Region(object):
 
 class Grid_1D( object ):
     def __init__(self, gridData):
-        self.__buildVertices( gridData )
-        self.__buildRegions( gridData )
+        gridData.initialize()
+        self.__buildVertices(gridData)
+        self.__buildRegions(gridData)
         self.__computeVolumes()
 
     def __buildVertices(self, gridData):
@@ -136,7 +140,9 @@ class Grid_1D( object ):
             regionName = gridData.regionNames[regionIndex]
             region = Region(regionName, regionIndex)
             for iElem in gridData.regionElements[regionIndex]:
-                e = Element( [ self.__vertices[iElem[0]], self.__vertices[iElem[1]] ], elementIndex )
+                v1 = gridData.elemConnectivity[iElem][0]
+                v2 = gridData.elemConnectivity[iElem][1]
+                e = Element( [ self.__vertices[v1], self.__vertices[v2] ], elementIndex )
                 region.addElement(e)
                 self.__elements.append(e)
                 elementIndex += 1
@@ -169,7 +175,8 @@ class Grid_1D( object ):
 
 def createGridData( L, numberOfNodes ):
     nodesCoord = np.linspace( 0, L, numberOfNodes )
-    elemConn = np.zeros((numberOfNodes-1,2),dtype=int)
+    elemConn = [[0,0] for i in range(numberOfNodes-1)]
+    # elemConn = np.zeros((numberOfNodes-1,2),dtype=int)
     for i in range( numberOfNodes-1 ):
         elemConn[i][0] = i
         elemConn[i][1] = i+1
@@ -196,16 +203,15 @@ if __name__ == '__main__':
 ##    # #     print '\n'
 
 
+    # -------------- GRID DATA ----------------------------
     L_0 = 4.
     L_1 = 6.
     L = L_0 + L_1
     nVertices = 15
-    nodesCoord, elemConn = createGridData( L, nVertices )
-
-    # -------------- GRID DATA ----------------------------
+    nodesCoord, elemConn = createGridData(L, nVertices)
     gridData = GridData()
-    gridData.setElementConnectivity( elemConn )
-    gridData.setNodeCoordinates( nodesCoord )
+    gridData.setElementConnectivity(elemConn)
+    gridData.setNodeCoordinates(nodesCoord)
     centroidCoord = []
     for e in elemConn:
         x_0 = gridData.nodeCoordinates[e[0]]
@@ -222,7 +228,7 @@ if __name__ == '__main__':
     elemOnRegion1 = gridData.elemConnectivity[R1[0]:R1[-1]+1]
     elemOnRegion2 = gridData.elemConnectivity[R2[0]:R2[-1]+1]
     gridData.setElementsToRegions([elemOnRegion1, elemOnRegion2], namesOfRegions)
-    print gridData.regionElements
+    print elemOnRegion1
     # print gridData.regionNames
     # -----------------------------------------------------
 
