@@ -92,6 +92,9 @@ class Element(object):
     def getVolume(self):
         return self.__area*self.__elementLength
 
+    def getSubVolume(self):
+        return self.__area*self.__elementLength/2.
+
 
 class Region(object):
     def __init__(self, name, index):

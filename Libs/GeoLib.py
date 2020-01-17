@@ -1,16 +1,14 @@
 import unittest
 
-def AssemblyStiffnessMatrix(linearSystem, grid, lame, poisson, uShift):
+def AssemblyStiffnessMatrix(linearSystem, grid, modulus, uShift):
     for region in grid.getRegions():
-        value = lame.getValue(region)*(1 - poisson.getValue(region))/poisson.getValue(region)
+        value = modulus.getValue(region)
     	for e in region.getElements():
             dx = e.getLength()
             f = e.getFace()
             A = f.getArea()
-            backVertex = f.getBackwardVertex()
-            forVertex = f.getForwardVertex()
-            bIndex = backVertex.getIndex() + uShift*grid.getNumberOfVertices()
-            fIndex = forVertex.getIndex() + uShift*grid.getNumberOfVertices()
+            bIndex = f.getBackwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
+            fIndex = f.getForwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
             forceOperator = [-value/dx, value/dx]
             localIndex = 0
             for v in e.getVertices():
@@ -19,6 +17,19 @@ def AssemblyStiffnessMatrix(linearSystem, grid, lame, poisson, uShift):
                 linearSystem.addValueToMatrix( bIndex, vIndex, flux )
                 linearSystem.addValueToMatrix( fIndex, vIndex, -flux )
                 localIndex += 1
+
+def AssemblyGravityToVector(linearSystem, grid, density, gravity, uShift):
+    for region in grid.getRegions():
+        rho = density.getValue(region)
+        for elem in region.getElements():
+            dx = elem.getLength()
+            face = elem.getFace()
+            bIndex = face.getBackwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
+            fIndex = face.getForwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
+            value = -rho*gravity*elem.getSubVolume()
+            linearSystem.addValueToVector( bIndex, value )
+            linearSystem.addValueToVector( fIndex, value )
+
 
 def AssemblyPorePressureToGeoMatrix(linearSystem, grid, props, uShift):
 	for e in grid.getElements():
@@ -60,18 +71,16 @@ if __name__ == '__main__':
         x_0 = gridData.nodeCoordinates[e[0]]
         x_1 = gridData.nodeCoordinates[e[1]]
         centroidCoord.append((x_0 + x_1)/2.)
-    R1 = []
-    R2 = []
+    region_1 = []
+    region_2 = []
     namesOfRegions = ['bottom', 'top']
     for e, x in enumerate(centroidCoord):
         if x <= L_0:
-            R1.append(e)
+            region_1.append(e)
         elif x > L_0:
-            R2.append(e)
-    elemOnRegion1 = gridData.elemConnectivity[R1[0]:R1[-1]+1]
-    elemOnRegion2 = gridData.elemConnectivity[R2[0]:R2[-1]+1]
-    print gridData.elemConnectivity
-    gridData.setElementsToRegions([elemOnRegion1, elemOnRegion2], namesOfRegions)
+            region_2.append(e)
+    gridData.setElementsToRegion(region_1, 'lower_layer')
+    gridData.setElementsToRegion(region_2, 'upper_layer')
     g = Grid_1D( gridData )
 
     for region in g.getRegions():
@@ -85,22 +94,16 @@ if __name__ == '__main__':
     # -----------------------------------------------------
 
     # -------------- PROPERTIES ----------------------------
-    lame = ScalarField(g.getNumberOfRegions())
-    poisson = ScalarField(g.getNumberOfRegions())
-    valuesLame = [1, 1]
-    valuesPoisson = [0.1, 0.1]
-    i = 0
-    for region in g.getRegions():
-        lame.setValue(region, valuesLame[i])
-        poisson.setValue(region, valuesPoisson[i])
-        i += 1
+    M = ScalarField(g.getNumberOfRegions())
+    M.setValue(g.getRegions()[0], 1000.)
+    M.setValue(g.getRegions()[1], 2000.)
     # -----------------------------------------------------
 
     # -------------- LINEAR SYSTEM ------------------------
     ls = LinearSystem(g.getNumberOfVertices())
-    AssemblyStiffnessMatrix(ls, g, lame, poisson, 0)
+    AssemblyStiffnessMatrix(ls, g, M, 0)
     ls.applyDirichlet(0, 0)
-    ls.applyNeumann(-1, 1000)
+    ls.applyNeumann(-1, -1000)
     print g.getNumberOfVertices()
     print ls.getMatrix()
     print ls.getVector()
