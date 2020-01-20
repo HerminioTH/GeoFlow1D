@@ -1,5 +1,3 @@
-import unittest
-
 def AssemblyStiffnessMatrix(linearSystem, grid, modulus, uShift):
     for region in grid.getRegions():
         value = modulus.getValue(region)
