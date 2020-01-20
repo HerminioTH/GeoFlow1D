@@ -13,7 +13,14 @@ def AssemblyMassDarcyVelocities(linearSystem, grid, viscosity, permeability, den
 			for i,v in enumerate(elem.getVertices()):
 				flux = diffusiveOperator[i]
 				vIndex = v.getIndex()
-				linearSystem.addValueToMatrix( bIndex, vIndex, flux/dx )
-				linearSystem.addValueToMatrix( fIndex, vIndex, -flux/dx )
-			
+				linearSystem.addValueToMatrix(bIndex, vIndex, +flux/dx)
+				linearSystem.addValueToMatrix(fIndex, vIndex, -flux/dx)
+			linearSystem.addValueToVector(bIndex, -diffusiveOperator[0]*density*gravity)
+			linearSystem.addValueToVector(fIndex, -diffusiveOperator[1]*density*gravity)
+
+
+
+# def Assembly
+
+
 

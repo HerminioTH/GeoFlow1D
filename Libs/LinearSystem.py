@@ -13,11 +13,17 @@ class LinearSystem(object):
     def setValueToMatrix(self, row, col, value):
         self.__matrix[row][col] = value
 
+    def getMatrixValue(self, row, col):
+        return self.__matrix[row][col]
+
     def addValueToVector(self, row, value):
         self.__vector[row] += value
 
     def setValueToVector(self, row, value):
         self.__vector[row] = value
+
+    def getVectorValue(self, row):
+        return self.__vector[row]
 
     def getMatrix(self):
         return self.__matrix
@@ -32,7 +38,7 @@ class LinearSystem(object):
         self.__vector[row] = value
 
     def applyNeumann(self, row, value):
-        self.__vector[row] += -value
+        self.__vector[row] += value
 
     def solve(self):
 ##        self.__solution, a = spla.bicg( self.__matrix, self.__vector, tol=1e-9, maxiter=1000 )

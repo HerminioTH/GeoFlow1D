@@ -31,19 +31,19 @@ q = 0.0
 # -------------- NUMERICAL SOLUTION -------------------
 ls = LinearSystem(grid.getNumberOfVertices())
 AssemblyMassDarcyVelocities(ls, grid, mu, permeability, rho, g, pShift=0)
-p_bar = 2.
-Flux = 1.0e-2
+p_bar = 20000.
 ls.applyDirichlet(0, p_bar)
-ls.applyNeumann(-1, Flux)
 ls.solve()
+print ls.getMatrix()
+print ls.getVector()
 # -----------------------------------------------------
 
 # ------------- ANALYTICAL SOLUTION -------------------
-def analyticalSolution(x, k, mu, q, Flux, p_bar):
+def analyticalSolution(x, rho, g, p_bar):
 	x = np.array(x)
-	return (-mu*q/k)*x*x + (Flux + q*L)*x*mu/k + p_bar
+	return rho*g*x + p_bar
 x_a = np.linspace(0, L, 100)
-p_a = analyticalSolution(x_a, K, mu, q, Flux, p_bar)
+p_a = analyticalSolution(x_a, rho, g, p_bar)
 # -----------------------------------------------------
 
 # -------------- PLOT SOLUTION ------------------------
