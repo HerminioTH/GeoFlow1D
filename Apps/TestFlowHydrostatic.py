@@ -34,8 +34,6 @@ AssemblyMassDarcyVelocities(ls, grid, mu, permeability, rho, g, pShift=0)
 p_bar = 20000.
 ls.applyDirichlet(0, p_bar)
 ls.solve()
-print ls.getMatrix()
-print ls.getVector()
 # -----------------------------------------------------
 
 # ------------- ANALYTICAL SOLUTION -------------------
