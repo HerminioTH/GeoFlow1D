@@ -25,23 +25,35 @@ permeability.setValue(grid.getRegions()[0], K)
 rho = 1000.
 mu =1e-3
 g = -9.81
-q = 0.0
+q = -9.e1
 # -----------------------------------------------------
 
-# -------------- NUMERICAL SOLUTION -------------------
+
+# - BEGIN ------ NUMERICAL SOLUTION -------------------
 ls = LinearSystem(grid.getNumberOfVertices())
 AssemblyMassDarcyVelocities(ls, grid, mu, permeability, rho, g, pShift=0)
 p_bar = 2.
-Flux = 1.0e-2
-ls.applyDirichlet(0, p_bar)
+Flux = 1e1
+
+# ----------- Neumann ------------
 ls.applyNeumann(-1, Flux)
+for v in grid.getVertices():
+	ls.applyNeumann(v.getIndex(), q*v.getVolume())
+# ----- End - Neumann ------------
+
+# ---------- Dirichlet -----------
+ls.applyDirichlet(0, p_bar)
+# ---- End - Dirichlet -----------
+
 ls.solve()
-# -----------------------------------------------------
+# - END -------- NUMERICAL SOLUTION -------------------
+
 
 # ------------- ANALYTICAL SOLUTION -------------------
 def analyticalSolution(x, k, mu, q, Flux, p_bar):
 	x = np.array(x)
-	return (-mu*q/k)*x*x + (Flux + q*L)*x*mu/k + p_bar
+	return (-mu*q/k/2.)*x*x + (Flux + q*L)*x*mu/k + p_bar
+
 x_a = np.linspace(0, L, 100)
 p_a = analyticalSolution(x_a, K, mu, q, Flux, p_bar)
 # -----------------------------------------------------
