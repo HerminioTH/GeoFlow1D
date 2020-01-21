@@ -42,10 +42,5 @@ class Test_Flow(unittest.TestCase):
 		self.assertEqual(self.ls.getVectorValue(2), self.D*self.density*self.gravity)
 
 
-
-
-
-
-
 if __name__ == '__main__':
 	unittest.main()
