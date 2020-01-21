@@ -29,7 +29,7 @@ class Test_Flow(unittest.TestCase):
 		self.ls = LinearSystem(self.grid.getNumberOfVertices())
 
 	def test_AssemblyDarcyVelocities(self):
-		AssemblyMassDarcyVelocities(self.ls, self.grid, self.viscosity, self.permeability, self.density, self.gravity, pShift=0)
+		AssemblyDarcyVelocitiesToMatrix(self.ls, self.grid, self.viscosity, self.permeability, pShift=0)
 		self.assertEqual(self.ls.getMatrixValue(0,0), self.Dx)
 		self.assertEqual(self.ls.getMatrixValue(0,1), -self.Dx)
 		self.assertEqual(self.ls.getMatrixValue(1,0), -self.Dx)
@@ -38,6 +38,7 @@ class Test_Flow(unittest.TestCase):
 		self.assertEqual(self.ls.getMatrixValue(2,1), -self.Dx)
 		self.assertEqual(self.ls.getMatrixValue(2,2), self.Dx)
 
+		AssemblyDarcyVelocitiesToVector(self.ls, self.grid, self.viscosity, self.permeability, self.density, self.gravity, pShift=0)
 		self.assertEqual(self.ls.getVectorValue(0), -self.D*self.density*self.gravity)
 		self.assertEqual(self.ls.getVectorValue(2), self.D*self.density*self.gravity)
 
