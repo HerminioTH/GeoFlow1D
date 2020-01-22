@@ -4,6 +4,8 @@ class TimeHandler( object ):
         self.__finalTime = finalTime
         self.__initialTime = initialTime
         self.__currentTime = initialTime
+        if self.__timeStep > self.__finalTime:
+            raise Exception("Time step size cannot be greater than final time.")
 
     def advanceTime( self ):
         self.__currentTime += self.__timeStep

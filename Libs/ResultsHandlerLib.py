@@ -1,16 +1,16 @@
 import os
 
 class SaveResults( object ):
-    def __init__( self, grid, name, folderName=None, fieldName='NONE', units='NONE' ):
+    def __init__( self, grid, fileName, folderName=None, fieldName='NONE', units='NONE' ):
         self.__grid = grid
         self.__firstTimeField = True
         self.__fieldName = fieldName
         self.__units = units
         if folderName == None:
-            self.__file = open( name, 'w' )
+            self.__file = open( fileName, 'w' )
         else:
             self.__ensure_dir( folderName )
-            self.__file = open( folderName + name, 'w' )
+            self.__file = open( folderName + fileName, 'w' )
         self.__writeCoordinates()
         self.__writeVolumes()
 

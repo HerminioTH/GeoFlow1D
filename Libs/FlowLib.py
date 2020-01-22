@@ -55,6 +55,6 @@ def AssemblyFluidFlowAccumulationToVector(linearSystem, grid, timeStep, phiOnReg
 		for element in region.getElements():
 			bVertex = element.getVertices()[0]
 			fVertex = element.getVertices()[1]
-			value = phi*(cs + cf)*element.getSubVolume()
+			value = phi*(cs + cf)*element.getSubVolume()/timeStep
 			linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, value*p_old.getValue(bVertex))
 			linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, value*p_old.getValue(fVertex))

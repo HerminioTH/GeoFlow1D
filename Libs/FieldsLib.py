@@ -12,6 +12,9 @@ class ScalarField(object):
     def setField(self, values):
         self.__listOfValues = values
 
+    def getField(self):
+        return self.__listOfValues
+
     def addValue(self, entity, value):
         self.__listOfValues[entity.getIndex()] += value
 

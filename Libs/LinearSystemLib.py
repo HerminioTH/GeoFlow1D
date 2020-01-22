@@ -32,9 +32,15 @@ class LinearSystem(object):
         return self.__vector
 
     def applyDirichlet(self, row, value):
+        self.applyDirichletToMatrix(row, value)
+        self.applyDirichletToVector(row, value)
+
+    def applyDirichletToMatrix(self, row, value):
         for col in range( self.__size ):
             self.__matrix[row][col] = 0.0
         self.__matrix[row][row] = 1.0
+
+    def applyDirichletToVector(self, row, value):
         self.__vector[row] = value
 
     def applyNeumann(self, row, value):
