@@ -2,7 +2,7 @@ import unittest
 from GridLib import *
 from FlowLib import *
 from FieldsLib import *
-from LinearSystem import *
+from LinearSystemLib import *
 
 class Test_Flow(unittest.TestCase):
 	def setUp(self):

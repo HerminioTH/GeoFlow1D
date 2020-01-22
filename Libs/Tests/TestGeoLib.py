@@ -2,7 +2,7 @@ import unittest
 from GridLib import *
 from GeoLib import *
 from FieldsLib import *
-from LinearSystem import *
+from LinearSystemLib import *
 
 class Test_Assembly(unittest.TestCase):
 	def setUp(self):

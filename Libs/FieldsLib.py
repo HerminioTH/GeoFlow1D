@@ -1,30 +1,30 @@
 import numpy as np
 
-class ScalarField( object ):
-    def __init__( self, size, name=None, unity=None ):
+class ScalarField(object):
+    def __init__(self, size, initialValue=0, name=None, unity=None ):
         self.__name = name
         self.__unity = unity
-        self.__listOfValues = np.zeros( size )
+        self.__listOfValues = initialValue*np.ones(size)
 
-    def setValue( self, entity, value ):
-        i = entity.getIndex()
-        self.__listOfValues[i] = value
+    def setValue(self, entity, value):
+        self.__listOfValues[entity.getIndex()] = value
 
-    def addValue( self, entity, value ):
-        i = entity.getIndex()
-        self.__listOfValues[i] += value
+    def setField(self, values):
+        self.__listOfValues = values
 
-    def getValue( self, entity ):
-        i = entity.getIndex()
-        return self.__listOfValues[i]
+    def addValue(self, entity, value):
+        self.__listOfValues[entity.getIndex()] += value
 
-    def getName( self ):
+    def getValue(self, entity):
+        return self.__listOfValues[entity.getIndex()]
+
+    def getName(self):
         return self.__name
 
-    def getUnity( self ):
+    def getUnity(self):
         return self.__unity
 
-    def getValues( self ):
+    def getValues(self):
         return self.__listOfValues
 
 

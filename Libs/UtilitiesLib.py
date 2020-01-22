@@ -2,6 +2,13 @@ from FieldsLib import *
 from GridLib import *
 import numpy as np
 import matplotlib.pylab as plt
+import json
+
+def getJsonData(jsonFile):
+    f = open(jsonFile)
+    data = json.load(f)
+    f.close()
+    return data
 
 def computeVolumetricStrain( disp, grid ):
     epsilon = ScalarField( grid.getNumberOfVertices() )

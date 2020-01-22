@@ -1,6 +1,6 @@
 from GridLib import *
 from FieldsLib import *
-from LinearSystem import *
+from LinearSystemLib import *
 from GeoLib import *
 import numpy as np
 import pylab as pl

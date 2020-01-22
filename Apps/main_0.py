@@ -1,7 +1,7 @@
 # -*- coding: cp1252 -*-
 from FieldsLib import *
 from GridLib import *
-from LinearSystem import *
+from LinearSystemLib import *
 # from PropertyParser import Properties
 import GeoLib
 import numpy as np

@@ -41,7 +41,9 @@ class Test_Results(unittest.TestCase):
 		self.assertListEqual(res.times, [0.12, 0.24])
 		self.assertListEqual(res.getSolutionAtTime(0.12), [50.2, 34.8, 14.7, 2.3])
 		self.assertListEqual(res.getSolutionAtTime(0.24), [50.2, 32.8, 13.7, 2.1])
-		with self.assertRaises(Exception) as context: res.getSolutionAtTime(0.27)
+
+		with self.assertRaises(Exception) as context:
+			res.getSolutionAtTime(0.27)
 		self.assertTrue('Time 0.270000 does not exist.' in context.exception)
 
 

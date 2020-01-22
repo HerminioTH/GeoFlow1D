@@ -1,6 +1,6 @@
 from GridLib import *
 from FieldsLib import *
-from LinearSystem import *
+from LinearSystemLib import *
 from FlowLib import *
 from UtilitiesLib import *
 import numpy as np
@@ -31,7 +31,8 @@ q = -9.e1
 
 # - BEGIN ------ NUMERICAL SOLUTION -------------------
 ls = LinearSystem(grid.getNumberOfVertices())
-AssemblyMassDarcyVelocities(ls, grid, mu, permeability, rho, g, pShift=0)
+AssemblyDarcyVelocitiesToMatrix(ls, grid, mu, permeability, pShift=0)
+AssemblyDarcyVelocitiesToVector(ls, grid, mu, permeability, rho, g, pShift=0)
 p_bar = 2.
 Flux = 1e1
 
@@ -66,5 +67,6 @@ pl.plot(p_a, x_a, '-', label='Analytic')
 pl.grid(True)
 pl.xlabel('pressure')
 pl.ylabel('x')
+pl.legend(loc=0, numpoints=1)
 pl.show()
 # -----------------------------------------------------
