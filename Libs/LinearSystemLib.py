@@ -63,6 +63,9 @@ class LinearSystem(object):
         self.eraseVector()
         self.eraseMatrix()
 
+    def splitSolution(self, n):
+        return self.__solution[:n], self.__solution[n:]
+
 
 class TransientSolutionHandler( object ):
     def __init__(self, initialTime, timeStep):

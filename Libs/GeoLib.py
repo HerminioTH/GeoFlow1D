@@ -4,7 +4,6 @@ def AssemblyStiffnessMatrix(linearSystem, grid, modulus, uShift):
     	for e in region.getElements():
             dx = e.getLength()
             f = e.getFace()
-            A = f.getArea()
             bIndex = f.getBackwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
             fIndex = f.getForwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
             forceOperator = [-value/dx, value/dx]
@@ -27,6 +26,22 @@ def AssemblyGravityToVector(linearSystem, grid, density, gravity, uShift):
             value = -rho*gravity*elem.getSubVolume()
             linearSystem.addValueToVector( bIndex, value )
             linearSystem.addValueToVector( fIndex, value )
+
+def AssemblyPorePressureToMatrix(linearSystem, grid, biot, uShift):
+    for region in grid.getRegions():
+        alpha = biot.getValue(region)
+        for e in region.getElements():
+            f = e.getFace()
+            backVertex = f.getBackwardVertex()
+            forVertex = f.getForwardVertex()
+            bIndex = backVertex.getIndex() + uShift*grid.getNumberOfVertices()
+            fIndex = forVertex.getIndex() + uShift*grid.getNumberOfVertices()
+            operator = [alpha/2., alpha/2.]
+            for i,v in enumerate(e.getVertices()):
+                flux = operator[i]
+                vIndex = v.getIndex() + (1-uShift)*grid.getNumberOfVertices()
+                linearSystem.addValueToMatrix( bIndex, vIndex, flux )
+                linearSystem.addValueToMatrix( fIndex, vIndex, -flux )
 
 
 def AssemblyPorePressureToGeoMatrix(linearSystem, grid, props, uShift):

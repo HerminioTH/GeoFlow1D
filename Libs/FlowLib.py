@@ -12,7 +12,7 @@ def AssemblyDarcyVelocitiesToMatrix(linearSystem, grid, viscosity, permeability,
 			diffusiveOperator = [k*A/viscosity, -k*A/viscosity]
 			for i,v in enumerate(elem.getVertices()):
 				flux = diffusiveOperator[i]
-				vIndex = v.getIndex()
+				vIndex = v.getIndex() + pShift*grid.getNumberOfVertices()
 				linearSystem.addValueToMatrix(bIndex, vIndex, +flux/dx)
 				linearSystem.addValueToMatrix(fIndex, vIndex, -flux/dx)
 
