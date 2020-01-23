@@ -37,10 +37,13 @@ class Test_Element(unittest.TestCase):
 	def setUp(self):
 		v1 = Vertex(11, 0.4)
 		v2 = Vertex(12, 0.52)
-		self.e = Element([v1, v2], 3, 2.3)
+		self.e = Element([v1, v2], 3, 1, 2.3)
 
 	def test_Index(self):
 		self.assertEqual(self.e.getIndex(), 3)
+
+	def test_ParentRegionIndex(self):
+		self.assertEqual(self.e.getParentRegionIndex(), 1)
 
 	def test_Area(self):
 		self.assertEqual(self.e.getArea(), 2.3)
@@ -64,14 +67,15 @@ class Test_Region(unittest.TestCase):
 		v1 = Vertex(11, 0.40)
 		v2 = Vertex(12, 0.52)
 		v3 = Vertex(17, 0.60)
-		e1 = Element([v1, v2], 3, 2.3)
-		e2 = Element([v2, v3], 5, 2.3)
-		self.region = Region("BODY", 7)
+		self.regionIndex = 7
+		e1 = Element([v1, v2], 3, self.regionIndex, 2.3)
+		e2 = Element([v2, v3], 5, self.regionIndex, 2.3)
+		self.region = Region("BODY", self.regionIndex)
 		self.region.addElement(e1)
 		self.region.addElement(e2)
 
 	def test_Index(self):
-		self.assertEqual(self.region.getIndex(), 7)
+		self.assertEqual(self.region.getIndex(), self.regionIndex)
 
 	def test_Name(self):
 		self.assertEqual(self.region.getName(), "BODY")
@@ -80,6 +84,8 @@ class Test_Region(unittest.TestCase):
 		elements = self.region.getElements()
 		self.assertEqual(elements[0].getIndex(), 3)
 		self.assertEqual(elements[1].getIndex(), 5)
+		self.assertEqual(elements[0].getParentRegionIndex(), self.regionIndex)
+		self.assertEqual(elements[1].getParentRegionIndex(), self.regionIndex)
 
 
 
@@ -147,6 +153,13 @@ class Test_Grid(unittest.TestCase):
 		elems_r2 = regions[1].getElements()
 		elem_r2_indices = [4, 5, 6, 7, 8, 9]
 		[self.assertEqual(elems_r2[i].getIndex(), elem_r2_indices[i]) for i in range(4)]
+
+	def test_ElementParentRegions(self):
+		for i,region in enumerate(self.grid.getRegions()):
+			if i == 0:	[self.assertEqual(e.getParentRegionIndex(), 0) for e in region.getElements()]
+			else:		[self.assertEqual(e.getParentRegionIndex(), 1) for e in region.getElements()]
+
+
 
 if __name__ == '__main__':
 	unittest.main()

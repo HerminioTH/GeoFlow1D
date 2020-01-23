@@ -36,12 +36,12 @@ def AssemblyPorePressureToMatrix(linearSystem, grid, biot, uShift):
             forVertex = f.getForwardVertex()
             bIndex = backVertex.getIndex() + uShift*grid.getNumberOfVertices()
             fIndex = forVertex.getIndex() + uShift*grid.getNumberOfVertices()
-            operator = [alpha/2., alpha/2.]
+            operator = [-alpha/2., -alpha/2.]
             for i,v in enumerate(e.getVertices()):
                 flux = operator[i]
-                vIndex = v.getIndex() + (1-uShift)*grid.getNumberOfVertices()
-                linearSystem.addValueToMatrix( bIndex, vIndex, flux )
-                linearSystem.addValueToMatrix( fIndex, vIndex, -flux )
+                col = v.getIndex() + (1-uShift)*grid.getNumberOfVertices()
+                linearSystem.addValueToMatrix( bIndex, col, flux )
+                linearSystem.addValueToMatrix( fIndex, col, -flux )
 
 
 def AssemblyPorePressureToGeoMatrix(linearSystem, grid, props, uShift):

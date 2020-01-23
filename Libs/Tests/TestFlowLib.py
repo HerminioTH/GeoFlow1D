@@ -16,9 +16,16 @@ class Test_Flow(unittest.TestCase):
 		gridData.setNodeCoordinates(nodesCoord)
 		self.grid = Grid_1D(gridData)
 
+		self.timeStep = 0.5
+
 		k = 3.0
 		self.permeability = ScalarField(self.grid.getNumberOfRegions())
 		self.permeability.setValue(self.grid.getRegions()[0], k)
+
+		alpha = 1.0
+		self.biot = ScalarField(self.grid.getNumberOfRegions())
+		self.biot.setValue(self.grid.getRegions()[0], alpha)
+
 		self.viscosity = 1e-3
 		self.density = 1000.
 		self.gravity = -10.
@@ -41,6 +48,18 @@ class Test_Flow(unittest.TestCase):
 		AssemblyDarcyVelocitiesToVector(self.ls, self.grid, self.viscosity, self.permeability, self.density, self.gravity, pShift=0)
 		self.assertEqual(self.ls.getVectorValue(0), -self.D*self.density*self.gravity)
 		self.assertEqual(self.ls.getVectorValue(2), self.D*self.density*self.gravity)
+
+
+	def test_VolumetricStrainToVector(self):
+		u_old = ScalarField(self.grid.getNumberOfVertices())
+		[u_old.setValue(v, self.dx + v.getCoordinate()**2) for v in self.grid.getVertices()]
+		for v in self.grid.getVertices():
+			print u_old.getValue(v)
+		self.ls.eraseVector()
+		AssemblyVolumetricStrainToVector(self.ls, self.grid, self.timeStep, self.biot, u_old)
+		for v in self.grid.getVertices():
+			print self.ls.getVector()[v.getIndex()]
+
 
 
 if __name__ == '__main__':

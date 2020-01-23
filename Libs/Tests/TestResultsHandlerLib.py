@@ -12,6 +12,7 @@ class Test_Results(unittest.TestCase):
 		gridData.setNodeCoordinates(nodesCoord)
 		self.grid = Grid_1D(gridData)
 
+		self.source = "settings\\"
 		self.directory = "FOLDER_ONE\\FOLDER_TWO\\"
 		self.fileName = "Field.txt"
 		self.fieldName = "luminosity"
@@ -21,6 +22,7 @@ class Test_Results(unittest.TestCase):
 		res = SaveResults(self.grid, self.fileName, self.directory, self.fieldName, self.unitName)
 		res.saveField(0.12, [50.2, 34.8, 14.7, 2.3])
 		res.saveField(0.24, [50.2, 32.8, 13.7, 2.1])
+		res.copySettings(self.source, self.directory)
 		res.close()
 
 		f = open(self.directory + self.fileName)
@@ -33,6 +35,11 @@ class Test_Results(unittest.TestCase):
 		self.assertEqual(lines[6], '0.12,50.2,34.8,14.7,2.3,\n')
 		self.assertEqual(lines[7], '0.24,50.2,32.8,13.7,2.1,\n')
 		f.close()
+
+	# def test_CopySettings(self):
+	# 	res = SaveResults(self.grid, self.fileName, self.directory, self.fieldName, self.unitName)
+	# 	# res.copySettings(self.source, self.directory)
+	# 	res.close()
 
 	def test_ReadResults(self):
 		res = ReadResults(self.directory + self.fileName)

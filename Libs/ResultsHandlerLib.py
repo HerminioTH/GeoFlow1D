@@ -1,4 +1,5 @@
 import os
+import shutil
 
 class SaveResults( object ):
     def __init__( self, grid, fileName, folderName=None, fieldName='NONE', units='NONE' ):
@@ -35,6 +36,11 @@ class SaveResults( object ):
             line += str(coord)+','
         self.__file.write( line )
         self.__file.write('\n')
+
+    def copySettings(self, source, destination):
+        for file in os.listdir(source):
+            print source + file
+            shutil.copyfile(source + file, destination + file)
 
     def saveField(self, currentTime, field):
         if self.__firstTimeField:
@@ -90,4 +96,11 @@ class ReadResults(object):
             return self.field[i]
         except:
             raise Exception('Time %f does not exist.'%time)
+
+
+
+
+
+
+
 

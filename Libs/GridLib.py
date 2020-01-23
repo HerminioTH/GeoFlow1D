@@ -64,8 +64,9 @@ class Face(object):
 
 
 class Element(object):
-    def __init__(self, vertices, index, area=1.0):
+    def __init__(self, vertices, index, parentRegionIndex, area=1.0):
         self.__globalIndex = index
+        self.__parentRegionIndex = parentRegionIndex
         self.__area = area
         self.__vertices = vertices
         self.__buildFace()
@@ -76,6 +77,9 @@ class Element(object):
 
     def getIndex(self):
         return self.__globalIndex
+
+    def getParentRegionIndex(self):
+        return self.__parentRegionIndex
 
     def getVertices(self):
         return self.__vertices
@@ -145,7 +149,7 @@ class Grid_1D( object ):
             for iElem in gridData.regionElements[regionIndex]:
                 v1 = gridData.elemConnectivity[iElem][0]
                 v2 = gridData.elemConnectivity[iElem][1]
-                e = Element( [ self.__vertices[v1], self.__vertices[v2] ], elementIndex )
+                e = Element( [ self.__vertices[v1], self.__vertices[v2] ], elementIndex, regionIndex )
                 region.addElement(e)
                 self.__elements.append(e)
                 elementIndex += 1
