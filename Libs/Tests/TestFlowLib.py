@@ -16,7 +16,7 @@ class Test_Flow(unittest.TestCase):
 		gridData.setNodeCoordinates(nodesCoord)
 		self.grid = Grid_1D(gridData)
 
-		self.timeStep = 0.5
+		self.timeStep = 1.0
 
 		k = 3.0
 		self.permeability = ScalarField(self.grid.getNumberOfRegions())
@@ -51,14 +51,14 @@ class Test_Flow(unittest.TestCase):
 
 
 	def test_VolumetricStrainToVector(self):
+		self.ls.eraseVector()
 		u_old = ScalarField(self.grid.getNumberOfVertices())
 		[u_old.setValue(v, self.dx + v.getCoordinate()**2) for v in self.grid.getVertices()]
-		for v in self.grid.getVertices():
-			print u_old.getValue(v)
-		self.ls.eraseVector()
 		AssemblyVolumetricStrainToVector(self.ls, self.grid, self.timeStep, self.biot, u_old)
-		for v in self.grid.getVertices():
-			print self.ls.getVector()[v.getIndex()]
+		self.assertEqual(self.ls.getVector()[0], 4.5)
+		self.assertEqual(self.ls.getVector()[1], 18.)
+		self.assertEqual(self.ls.getVector()[2], 13.5)
+
 
 
 

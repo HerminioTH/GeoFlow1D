@@ -79,6 +79,7 @@ AssemblyDarcyVelocitiesToVector(ls, grid, mu, k, rho_f, g, pShift)
 AssemblyBiotAccumulationToMatrix(ls, grid, timeStep, biot, phi, cs, cf, pShift)
 AssemblyBiotAccumulationToVector(ls, grid, timeStep, biot, phi, cs, cf, p_old, pShift)
 AssemblyVolumetricStrainToMatrix(ls, grid, timeStep, biot, pShift)
+AssemblyVolumetricStrainToVector(ls, grid, timeStep, biot, u_old, pShift)
 # -----------------------------------------------------
 
 # -------------- GEOMECHANICAL MODEL ------------------

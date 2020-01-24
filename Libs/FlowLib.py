@@ -115,13 +115,15 @@ def AssemblyVolumetricStrainToVector(linearSystem, grid, timeStep, biotOnRegions
 			uf = u_old.getValue(fVertex)
 			linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, value*(ub + uf))
 			linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, -value*(ub + uf))
-	# e = grid.getElements()[0]
-	# r = grid.getRegions()[e.getParentRegionIndex()]
-	# vIndex = e.getVertices()[0].getIndex()
-	# linearSystem.addValueToMatrix(vIndex + pShift*n, vIndex + (1-pShift)*n, -biotOnRegions.getValue(r)/timeStep)
+	e = grid.getElements()[0]
+	r = grid.getRegions()[e.getParentRegionIndex()]
+	bVertex = e.getVertices()[0]
+	linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, -biotOnRegions.getValue(r)*u_old.getValue(bVertex)/timeStep)
 
-	# e = grid.getElements()[-1]
-	# r = grid.getRegions()[e.getParentRegionIndex()]
-	# vIndex = e.getVertices()[1].getIndex()
-	# linearSystem.addValueToMatrix(vIndex + pShift*n, vIndex + (1-pShift)*n, biotOnRegions.getValue(r)/timeStep)
+	e = grid.getElements()[-1]
+	r = grid.getRegions()[e.getParentRegionIndex()]
+	fVertex = e.getVertices()[1]
+	linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, biotOnRegions.getValue(r)*u_old.getValue(fVertex)/timeStep)
+
+
 

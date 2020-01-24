@@ -9,7 +9,7 @@ from UtilitiesLib import getJsonData, plotMatrix
 
 # -------------- GRID DATA ----------------------------
 L = 10
-nVertices = 4
+nVertices = 40
 nodesCoord, elemConn = createGridData(L, nVertices)
 gridData = GridData()
 gridData.setElementConnectivity(elemConn)
@@ -78,6 +78,8 @@ AssemblyDarcyVelocitiesToMatrix(ls, grid, mu, k, pShift)
 AssemblyDarcyVelocitiesToVector(ls, grid, mu, k, rho_f, g, pShift)
 AssemblyBiotAccumulationToMatrix(ls, grid, timeStep, biot, phi, cs, cf, pShift)
 AssemblyBiotAccumulationToVector(ls, grid, timeStep, biot, phi, cs, cf, p_old, pShift)
+AssemblyVolumetricStrainToMatrix(ls, grid, timeStep, biot, pShift)
+AssemblyVolumetricStrainToVector(ls, grid, timeStep, biot, u_old, pShift)
 p_top = 0.0
 ls.applyDirichlet((1+pShift)*n-1, p_top)
 # -----------------------------------------------------
@@ -109,6 +111,7 @@ while timeHandler.isFinalTimeReached():
 	# --------------- FLUID FLOW MODEL --------------------
 	AssemblyDarcyVelocitiesToVector(ls, grid, mu, k, rho_f, g, pShift)
 	AssemblyBiotAccumulationToVector(ls, grid, timeStep, biot, phi, cs, cf, p_old, pShift)
+	AssemblyVolumetricStrainToVector(ls, grid, timeStep, biot, u_old, pShift)
 	ls.applyDirichletToVector((1+pShift)*n-1, p_top)
 	# -----------------------------------------------------
 
@@ -125,4 +128,4 @@ res_u.close()
 
 # print ls.getMatrix()
 # print ls.getVector()
-plotMatrix(ls.getMatrix())
+# plotMatrix(ls.getMatrix())
