@@ -17,7 +17,7 @@ solid = getJsonData(folderName + "\\solid.json")
 H = res_p.coord[-1]
 tao = 1.0e5
 g = 0.0
-terza = Solution(H, tao, solid, fluid, g)
+terza = Solution(H, tao, solid, fluid, -g)
 np = 50
 z_terza = terza.getPositionValues(np)
 

@@ -39,7 +39,6 @@ class SaveResults( object ):
 
     def copySettings(self, source, destination):
         for file in os.listdir(source):
-            print source + file
             shutil.copyfile(source + file, destination + file)
 
     def saveField(self, currentTime, field):

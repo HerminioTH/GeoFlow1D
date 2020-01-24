@@ -32,7 +32,7 @@ ls = LinearSystem(grid.getNumberOfVertices())
 AssemblyStiffnessMatrix(ls, grid, modulus, 0)
 AssemblyGravityToVector(ls, grid, density, g, 0)
 ls.applyDirichlet(0, 0)
-sigma = 1e4
+sigma = 5e4
 ls.applyNeumann(-1, -sigma)
 print grid.getNumberOfVertices()
 print ls.getMatrix()

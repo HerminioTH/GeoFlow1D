@@ -47,6 +47,7 @@ class Test_Flow(unittest.TestCase):
 
 		AssemblyDarcyVelocitiesToVector(self.ls, self.grid, self.viscosity, self.permeability, self.density, self.gravity, pShift=0)
 		self.assertEqual(self.ls.getVectorValue(0), -self.D*self.density*self.gravity)
+		self.assertEqual(self.ls.getVectorValue(1), 0.0)
 		self.assertEqual(self.ls.getVectorValue(2), self.D*self.density*self.gravity)
 
 

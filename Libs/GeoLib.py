@@ -16,16 +16,16 @@ def AssemblyStiffnessMatrix(linearSystem, grid, modulus, uShift):
                 localIndex += 1
 
 def AssemblyGravityToVector(linearSystem, grid, density, gravity, uShift):
+    n = grid.getNumberOfVertices()
     for region in grid.getRegions():
         rho = density.getValue(region)
         for elem in region.getElements():
-            dx = elem.getLength()
             face = elem.getFace()
-            bIndex = face.getBackwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
-            fIndex = face.getForwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
+            bVertex = face.getBackwardVertex()
+            fVertex = face.getForwardVertex()
             value = -rho*gravity*elem.getSubVolume()
-            linearSystem.addValueToVector( bIndex, value )
-            linearSystem.addValueToVector( fIndex, value )
+            linearSystem.addValueToVector(bVertex.getIndex() + uShift*n, value)
+            linearSystem.addValueToVector(fVertex.getIndex() + uShift*n, value)
 
 def AssemblyPorePressureToMatrix(linearSystem, grid, biot, uShift):
     for region in grid.getRegions():

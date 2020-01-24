@@ -19,18 +19,18 @@ def AssemblyDarcyVelocitiesToMatrix(linearSystem, grid, viscosity, permeability,
 
 
 def AssemblyDarcyVelocitiesToVector(linearSystem, grid, viscosity, permeability, density, gravity, pShift=0):
+	n = grid.getNumberOfVertices()
 	for region in grid.getRegions():
 		k = permeability.getValue(region)
 		for elem in region.getElements():
 			dx = elem.getLength()
 			face = elem.getFace()
 			A = face.getArea()
-			backVertex = face.getBackwardVertex()
-			forVertex = face.getForwardVertex()
-			bIndex = backVertex.getIndex() + pShift*grid.getNumberOfVertices()
-			fIndex = forVertex.getIndex() + pShift*grid.getNumberOfVertices()
-			linearSystem.addValueToVector(bIndex, -k*A/viscosity*density*gravity)
-			linearSystem.addValueToVector(fIndex,  k*A/viscosity*density*gravity)
+			value = k*A*density*gravity/viscosity
+			bIndex = face.getBackwardVertex().getIndex() + pShift*n
+			fIndex = face.getForwardVertex().getIndex() + pShift*n
+			linearSystem.addValueToVector(bIndex, -value)
+			linearSystem.addValueToVector(fIndex,  value)
 
 def AssemblyFluidFlowAccumulationToMatrix(linearSystem, grid, timeStep, phiOnRegions, csOnRegions, cf, pShift=0):
 	n = grid.getNumberOfVertices()

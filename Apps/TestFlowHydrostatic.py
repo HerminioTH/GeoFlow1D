@@ -37,6 +37,7 @@ ls.applyDirichlet(0, p_bar)
 ls.solve()
 # -----------------------------------------------------
 
+
 # ------------- ANALYTICAL SOLUTION -------------------
 def analyticalSolution(x, rho, g, p_bar):
 	x = np.array(x)
@@ -56,3 +57,7 @@ pl.xlabel('pressure')
 pl.ylabel('x')
 pl.show()
 # -----------------------------------------------------
+
+print '\n'
+print rho*g
+print (p_n[-1] - p_n[0])/L

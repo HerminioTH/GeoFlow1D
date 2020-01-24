@@ -141,17 +141,16 @@ class Solution( object ):
         self.Q = 1 / ( self.phi * self.c_f + ( self.alpha - self.phi ) * self.c_s );
 
     def _calculate_p_0( self, yPosition ):
-        self.p_0 = self.alpha * self.Q / ( self.M + self.alpha * self.alpha * self.Q ) * \
-            ( self.tao_0 + 0.5 * self.rho * self.g * self.height ) - self.rho_f * self.g * \
-            ( yPosition - 0.5 * self.height );
-        return self.p_0
+        Mu = self.M + self.alpha*self.alpha*self.Q
+        p_0 = self.alpha*self.Q*(self.tao_0 + 0.5*self.rho*self.g*self.height) / Mu \
+              - self.rho_f*self.g*(yPosition - 0.5*self.height)
+        return p_0
 
     def _calculate_v_0( self, yPosition ):
-        self.v_0 = ( self.rho - self.alpha * self.rho_f ) * self.g / ( 2 * self.M ) * yPosition \
-            * yPosition - ( ( self.tao_0 + 0.5 * self.rho * self.g * self.height ) / ( self.M + \
-            self.alpha * self.alpha * self.Q ) + ( self.rho - self.alpha * self.rho_f ) * self.g \
-            *self.height / ( 2 * self.M ) ) * yPosition;
-        return self.v_0
+        Mu = self.M + self.alpha*self.alpha*self.Q
+        v_0 = (self.rho - self.alpha*self.rho_f)*self.g*yPosition*(yPosition - self.height) / (2*self.M) \
+              - (self.tao_0 + 0.5*self.rho*self.g*self.height)*yPosition / Mu
+        return v_0
 
     # def getPositionValues( self, n = 200, axisName = None ):
     #     return self.getPositionValues(n)
@@ -169,22 +168,34 @@ class Solution( object ):
     def getPressureValue( self, yPosition, time, numberOfSummationTerms = 200 ):
         position = self.height - yPosition;
         if time == 0.0:
-            pressureValue = self._calculate_p_0( yPosition );
+            pressureValue = self._calculate_p_0(yPosition);
             return pressureValue
         else:
             summationResult = 0
-            for j in range( 0, numberOfSummationTerms ):
-                term_1 = 1.0 / ( 2.0 * j + 1.0 )
-                term_2 = ( math.exp( - ( ( time * self.c * ( math.pi ** 2.0 ) * ( ( 2.0 * j + 1.0 ) ** 2.0 ) ) /
-                                        ( 4.0 * ( self.height ** 2.0 ) ) ) ) )
-                term_3 = math.sin( ( math.pi * position * ( 2.0 * j + 1 ) ) / ( 2.0 * self.height ) )
-                summationResult += term_1 * term_2 * term_3
-            barP0 = self.alpha * self.Q / ( self.M + self.alpha * self.alpha * self.Q ) * \
-                ( self.tao_0 + 0.5 * self.rho * self.g * self.height ) - self.rho_f * self.g * \
-                ( 0.5 * self.height );
-            pressureValue = 4.0 * barP0 * summationResult / math.pi
-            pressureValue += self.rho_f * self.g * ( self.height - yPosition )
+            for j in range(0, numberOfSummationTerms):
+                term_1 = 1.0 / (2.0*j + 1.0)
+                term_2 = math.exp( -(time*self.c*(math.pi**2)*(2.0*j + 1.0)**2.0 ) / (4.0*self.height**2.0) )
+                term_3 = math.sin( math.pi*position*(2.0*j + 1) / (2.0*self.height) )
+                summationResult += term_1*term_2*term_3
+            barP0 = self._calculate_p_0(self.height)
+            pressureValue = self.rho_f*self.g*position + 4.0*barP0*summationResult / math.pi
             return pressureValue
+
+    # def getPressureValue( self, yPosition, time, numberOfSummationTerms = 200 ):
+    #     position = self.height - yPosition;
+    #     if time == 0.0:
+    #         pressureValue = self._calculate_p_0(yPosition);
+    #         return pressureValue
+    #     else:
+    #         summationResult = 0
+    #         for j in range(0, numberOfSummationTerms):
+    #             term_1 = 1.0 / (2.0*j + 1.0)
+    #             term_2 = math.exp( -(time*self.c*(math.pi**2)*(2.0*j + 1.0)**2.0 ) / (4.0*self.height**2.0) )
+    #             term_3 = math.cos( math.pi*position*(2.0*j + 1) / (2.0*self.height) )
+    #             summationResult += term_1*term_2*term_3
+    #         barP0 = self._calculate_p_0(self.height)
+    #         pressureValue = self.rho_f*self.g*position + 4.0*barP0*summationResult / math.pi
+    #         return pressureValue
 
     def getDisplacementValue( self, yPosition, time, numberOfSummationTerms = 200 ):
         position = self.height - yPosition;
@@ -199,9 +210,10 @@ class Solution( object ):
                                          ( 4.0 * ( self.height ** 2.0 ) ) ) ) )
                 term_3 = math.cos( ( math.pi * position * ( 2.0 * j + 1.0 ) ) / ( 2 * self.height ) )
                 summationResult += term_1 * term_2 * term_3
-            barP0 = self.alpha * self.Q / ( self.M + self.alpha * self.alpha * self.Q ) * \
-                ( self.tao_0 + 0.5 * self.rho * self.g * self.height ) - self.rho_f * self.g * \
-                ( 0.5 * self.height );
+            # barP0 = self.alpha * self.Q / ( self.M + self.alpha * self.alpha * self.Q ) * \
+            #     ( self.tao_0 + 0.5 * self.rho * self.g * self.height ) - self.rho_f * self.g * \
+            #     ( 0.5 * self.height );
+            barP0 = self._calculate_p_0(self.height)
             displacementValue = 8.0 * self.alpha * self.height * barP0 * summationResult / \
                 ( math.pi * math.pi * self.M )
             displacementValue -= ( self.g / self.M ) * ( self.rho - self.alpha * self.rho_f ) * \
@@ -225,11 +237,13 @@ class Solution( object ):
         '''If ny is an interger, then a list of equally spaced vertical position will be created. However, ny can be
             a list or an numpy array with specified vertical positions.'''
         positionValues, size = self.__getPositionValuesAndSize( ny )
-        pressureValues = [ ];
+        pressureValues = np.zeros(ny);
         for i in range( 0, size ):
-            pressureValue = self.getPressureValue( positionValues[ i ], time, numberOfSummationTerms );
-            pressureValues.append( pressureValue );
-        return np.array(pressureValues)
+            pressureValues[i] = self.getPressureValue( positionValues[ i ], time, numberOfSummationTerms )
+            # pressureValue = self.getPressureValue( positionValues[ i ], time, numberOfSummationTerms );
+            # pressureValues.append( pressureValue );
+        # return np.array(pressureValues)
+        return pressureValues
 
     def getDisplacementValuesConstTime( self, time, numberOfSummationTerms = 200, ny = 200 ):
         '''If ny is an interger, then a list of equally spaced vertical position will be created. However, ny can be

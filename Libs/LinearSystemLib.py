@@ -47,7 +47,7 @@ class LinearSystem(object):
         self.__vector[row] += value
 
     def solve(self):
-##        self.__solution, a = spla.bicg( self.__matrix, self.__vector, tol=1e-9, maxiter=1000 )
+       # self.__solution, a = spla.bicg( self.__matrix, self.__vector, tol=1e-9, maxiter=1000 )
         self.__solution = np.linalg.solve(self.__matrix, self.__vector)
 
     def getSolution(self):
