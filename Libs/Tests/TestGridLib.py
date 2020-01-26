@@ -125,17 +125,20 @@ class Test_GridData(unittest.TestCase):
 
 class Test_Grid(unittest.TestCase):
 	def setUp(self):
-		nodesCoord, elemConn = createGridData(15, 11)
+		self.n, self.H = 11, 15
+		nodesCoord, elemConn = createGridData(self.H, self.n)
 		gridData = GridData()
 		gridData.setElementConnectivity(elemConn)
 		gridData.setNodeCoordinates(nodesCoord)
 		gridData.setElementsToRegion([0, 1, 2, 3], 'lower_layer')
 		gridData.setElementsToRegion([4, 5, 6, 7, 8, 9], 'upper_layer')
+		gridData.addBoundary("TOP", 9, self.n-1)
+		gridData.addBoundary("BOTTOM", 0, 0)
 		self.grid = Grid_1D(gridData)
 
 	def test_Numbers(self):
-		self.assertEqual(self.grid.getNumberOfVertices(), 11)
-		self.assertEqual(self.grid.getNumberOfElements(), 10)
+		self.assertEqual(self.grid.getNumberOfVertices(), self.n)
+		self.assertEqual(self.grid.getNumberOfElements(), self.n-1)
 		self.assertEqual(self.grid.getNumberOfRegions(), 2)
 
 	def test_Volumes(self):
@@ -158,6 +161,21 @@ class Test_Grid(unittest.TestCase):
 		for i,region in enumerate(self.grid.getRegions()):
 			if i == 0:	[self.assertEqual(e.getParentRegionIndex(), 0) for e in region.getElements()]
 			else:		[self.assertEqual(e.getParentRegionIndex(), 1) for e in region.getElements()]
+
+	def test_Boundaries(self):
+		boundaries = self.grid.getBoundaries()
+		self.assertEqual(boundaries[0].getName(), "TOP")
+		self.assertEqual(boundaries[0].getVertex().getIndex(), 10)
+		self.assertEqual(boundaries[0].getElement().getIndex(), 9)
+
+		self.assertEqual(boundaries[1].getName(), "BOTTOM")
+		self.assertEqual(boundaries[1].getVertex().getIndex(), 0)
+		self.assertEqual(boundaries[1].getElement().getIndex(), 0)
+
+		self.assertEqual(self.grid.getBoundary("TOP").getName(), "TOP")
+		self.assertEqual(self.grid.getBoundary("BOTTOM").getName(), "BOTTOM")
+
+
 
 
 

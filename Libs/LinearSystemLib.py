@@ -46,6 +46,28 @@ class LinearSystem(object):
     def applyNeumann(self, row, value):
         self.__vector[row] += value
 
+    def applyBoundaryConditionsToMatrix(self, grid, boundSettings, shift):
+        n = grid.getNumberOfVertices()
+        for bName in boundSettings.keys():
+            bound = grid.getBoundary(bName)
+            bType = boundSettings.get(bName).get("Type")
+            bValue = boundSettings.get(bName).get("Value")
+            if bType == "Dirichlet":
+                self.applyDirichletToMatrix(bound.getVertex().getIndex() + shift*n, bValue)
+
+    def applyBoundaryConditionsToVector(self, grid, boundSettings, shift):
+        n = grid.getNumberOfVertices()
+        for bName in boundSettings.keys():
+            bound = grid.getBoundary(bName)
+            bType = boundSettings.get(bName).get("Type")
+            bValue = boundSettings.get(bName).get("Value")
+            if bType == "Dirichlet":
+                self.applyDirichletToVector(bound.getVertex().getIndex() + shift*n, bValue)
+            elif bType == "Neumann":
+                self.applyNeumann(bound.getVertex().getIndex() + shift*n, bValue)
+            else:
+                raise Exception("Boundary type %s is not supported."%bType)
+
     def solve(self):
        # self.__solution, a = spla.bicg( self.__matrix, self.__vector, tol=1e-9, maxiter=1000 )
         self.__solution = np.linalg.solve(self.__matrix, self.__vector)

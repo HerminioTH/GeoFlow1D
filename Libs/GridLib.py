@@ -6,6 +6,7 @@ class GridData( object ):
         self.nodeCoordinates = []
         self.regionElements = []
         self.regionNames = []
+        self.boundaries = []
 
     def setElementConnectivity(self, elemConnectivity):
         self.elemConnectivity = elemConnectivity
@@ -16,6 +17,10 @@ class GridData( object ):
     def setElementsToRegion(self, regionElements, regionName):
         self.regionElements.append(regionElements)
         self.regionNames.append(regionName)
+
+    def addBoundary(self, boundaryName, elemIndex, vertexIndex):
+        bound = {"NAME": boundaryName, "ElementIndex": elemIndex, "VertexIndex": vertexIndex}
+        self.boundaries.append(bound)
 
     def initialize(self):
         if len(self.regionElements) == 0:
@@ -118,12 +123,28 @@ class Region(object):
     def getElements(self):
         return self.__elements
 
+class Boundary(object):
+    def __init__(self, name, element, vertex):
+        self.__name = name
+        self.__element = element
+        self.__vertex = vertex
+
+    def getName(self):
+        return self.__name
+
+    def getElement(self):
+        return self.__element
+
+    def getVertex(self):
+        return self.__vertex
+
 
 class Grid_1D( object ):
     def __init__(self, gridData):
         gridData.initialize()
         self.__buildVertices(gridData)
         self.__buildRegions(gridData)
+        self.__buildBoundaries(gridData)
         self.__computeVolumes()
 
     def __buildVertices(self, gridData):
@@ -155,6 +176,16 @@ class Grid_1D( object ):
                 elementIndex += 1
             self.__regions.append(region)
 
+    def __buildBoundaries(self, gridData):
+        self.__boundaries = []
+        for bound in gridData.boundaries:
+            for e in self.__elements:
+                if e.getIndex() == bound.get("ElementIndex"):
+                    for v in e.getVertices():
+                        if v.getIndex() == bound.get("VertexIndex"):
+                            name = bound.get("NAME")
+                            self.__boundaries.append(Boundary(name, e, v))
+
     def getVertices( self ):
         return self.__vertices
 
@@ -163,6 +194,19 @@ class Grid_1D( object ):
 
     def getRegions( self ):
         return self.__regions
+
+    def getBoundaries(self):
+        return self.__boundaries
+
+    def getBoundary(self, name):
+        resp = False
+        for bound in self.__boundaries:
+            if bound.getName() == name:
+                resp = True
+                return bound
+                break
+        if resp == False:
+            raise Exception("Boundary %s does not exist."%name)
 
     def getNumberOfElements( self ):
         return self.__numberOfElements
