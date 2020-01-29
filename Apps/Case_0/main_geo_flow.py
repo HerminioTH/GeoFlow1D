@@ -5,12 +5,11 @@ from GeoLib import *
 from LinearSystemLib import *
 from TimeHandlerLib import *
 from ResultsHandlerLib import *
-from undrainedSolution import *
 from UtilitiesLib import getJsonData, plotMatrix
 
 # ------------------ GRID DATA ------------------------
 L = 10
-nVertices = 55
+nVertices = 60
 nodesCoord, elemConn = createGridData(L, nVertices)
 gridData = GridData()
 gridData.setElementConnectivity(elemConn)
@@ -25,7 +24,7 @@ grid = Grid_1D(gridData)
 
 # ---------------- FOLDER SETTINGS --------------------
 folder_settings = "settings\\"
-folder_results = "results\\"
+folder_results = "results\\geo_flow\\"
 # -----------------------------------------------------
 
 # -------------- NUMERICAL SETTINGS -------------------
@@ -67,7 +66,8 @@ for r in grid.getRegions():
 # -----------------------------------------------------
 
 # ---------------- INITIAL FIELDS ---------------------
-p_old, u_old = computeUndrainedSolution(grid, folder_settings)
+p_old = ScalarField(grid.getNumberOfVertices(), 0.0)
+u_old = ScalarField(grid.getNumberOfVertices(), 0.0)
 ic = getJsonData(folder_settings + "IC.json")
 g = ic.get("Gravity")
 # -----------------------------------------------------

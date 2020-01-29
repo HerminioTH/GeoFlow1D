@@ -83,6 +83,31 @@ def AssemblyBiotAccumulationToVector(linearSystem, grid, timeStep, biotOnRegions
 			linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, value*p_old.getValue(fVertex))
 
 
+def AssemblyFixedStressAccumulationToMatrix(linearSystem, grid, timeStep, biotOnRegions, bulkModulusOnRegions, pShift=0):
+	n = grid.getNumberOfVertices()
+	for region in grid.getRegions():
+		alpha = biotOnRegions.getValue(region)
+		modulus = bulkModulusOnRegions.getValue(region)
+		for element in region.getElements():
+			bIndex = element.getVertices()[0].getIndex()
+			fIndex = element.getVertices()[1].getIndex()
+			value = (alpha*alpha/modulus)*element.getSubVolume()/timeStep
+			linearSystem.addValueToMatrix(bIndex + pShift*n, bIndex + pShift*n, value)
+			linearSystem.addValueToMatrix(fIndex + pShift*n, fIndex + pShift*n, value)
+
+def AssemblyFixedStressAccumulationToVector(linearSystem, grid, timeStep, biotOnRegions, bulkModulusOnRegions, p_old, pShift=0):
+	n = grid.getNumberOfVertices()
+	for region in grid.getRegions():
+		alpha = biotOnRegions.getValue(region)
+		modulus = bulkModulusOnRegions.getValue(region)
+		for element in region.getElements():
+			bVertex = element.getVertices()[0]
+			fVertex = element.getVertices()[1]
+			value = (alpha*alpha/modulus)*element.getSubVolume()/timeStep
+			linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, value*p_old.getValue(bVertex))
+			linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, value*p_old.getValue(fVertex))
+
+
 def AssemblyVolumetricStrainToMatrix(linearSystem, grid, timeStep, biotOnRegions, pShift=0):
 	n = grid.getNumberOfVertices()
 	for region in grid.getRegions():

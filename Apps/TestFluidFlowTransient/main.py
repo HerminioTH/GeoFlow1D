@@ -2,7 +2,6 @@ from GridLib import *
 from FieldsLib import *
 from FlowLib import *
 from LinearSystemLib import *
-from ParserLib import *
 from TimeHandlerLib import *
 from ResultsHandlerLib import *
 from UtilitiesLib import getJsonData
