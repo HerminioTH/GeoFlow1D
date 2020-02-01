@@ -52,7 +52,6 @@ class Solution( object ):
         self._calculate_K_f();
         self._calculate_K_phi();
         self._calculate_K();
-        self._calculate_alpha();
 
         self._calculate_alpha();
         self._calculate_Q();

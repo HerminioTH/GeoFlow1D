@@ -10,28 +10,6 @@ def getJsonData(jsonFile):
     f.close()
     return data
 
-def computeVolumetricStrain( disp, grid ):
-    epsilon = ScalarField( grid.getNumberOfVertices() )
-    u = ScalarField( grid.getNumberOfVertices() )
-    for i,v in enumerate(grid.getVertices()):
-        u.setValue( v, disp[i] )
-    for e in grid.getElements():
-        f = e.getFace()
-        A = f.getArea()
-        dx = e.getLength()
-        backVertex = f.getBackwardVertex()
-        forVertex = f.getForwardVertex()
-        operator = [1/(2*dx), 1/(2*dx)]
-        operator = [1/2., 1/2.]
-        for i,v in enumerate(e.getVertices()):
-            value = operator[i]*u.getValue(v)
-            epsilon.addValue( backVertex, value/backVertex.getVolume() )
-            epsilon.addValue( forVertex, -value/forVertex.getVolume() )
-    firstVertex = grid.getVertices()[0]
-    lastVertex = grid.getVertices()[-1]
-    epsilon.addValue( firstVertex, u.getValue(firstVertex)/firstVertex.getVolume() )
-    epsilon.addValue( lastVertex, u.getValue(lastVertex)/lastVertex.getVolume() )
-    return epsilon
 
 def updateField( fieldOld, fieldArray, grid ):
     for i,vertex in enumerate(grid.getVertices()):
@@ -60,3 +38,13 @@ def plotMatrix( matrix ):
     plt.imshow( matrix[n:,n:], interpolation='nearest', cmap=cmap )
     plt.colorbar()
     plt.show()
+
+
+def computeNormL2(vector, grid):
+    soma = 0
+    for i,vertex in enumerate(grid.getVertices()):
+        soma += vertex.getVolume()*vector[i]*vector[i]
+    return soma**0.5
+
+def computeNormInf(vector):
+    return vector.max()

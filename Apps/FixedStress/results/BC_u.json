@@ -2,11 +2,11 @@
     "TOP":
     {
         "Type": "Neumann",
-        "Value": 0.0
+        "Value": 1e5
     },
     "BOTTOM":
     {
-        "Type": "Neumann",
+        "Type": "Dirichlet",
         "Value": 0.0
     }
 }

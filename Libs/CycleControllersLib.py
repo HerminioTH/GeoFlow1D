@@ -27,3 +27,29 @@ class TimeHandler( object ):
             return False
         else:
             return True
+
+    def printCurrentTime(self):
+        print self.__currentTime
+
+
+class IterativeCycleController(object):
+    def __init__(self, maxIte, maxTol):
+        self.maxIte = maxIte
+        self.maxTol = maxTol
+        self.__keepCycle = True
+        self.iteNumber = 0
+
+    def keepCycling(self):
+        return self.__keepCycle
+
+    def printKeepCycle(self):
+        print self.__keepCycle
+
+    def reset(self):
+        self.__keepCycle = True
+        self.iteNumber = 0
+
+    def execute(self, error):
+        self.iteNumber += 1
+        if error < self.maxTol or self.iteNumber > self.maxIte:
+            self.__keepCycle = False

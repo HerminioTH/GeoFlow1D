@@ -72,6 +72,9 @@ class LinearSystem(object):
        # self.__solution, a = spla.bicg( self.__matrix, self.__vector, tol=1e-9, maxiter=1000 )
         self.__solution = np.linalg.solve(self.__matrix, self.__vector)
 
+    def computeResidue(self):
+        self.residue = self.__vector - self.__matrix.dot(self.__solution)
+
     def getSolution(self):
         return self.__solution
 
