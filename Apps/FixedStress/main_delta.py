@@ -134,8 +134,8 @@ while timeHandler.isFinalTimeReached():
 		AssemblyBiotAccumulationToVector(ls_mass, grid, timeStep, biot, phi, cs, cf, p_old, pShift)
 
 		if method_split == "FIXED_STRESS":
-			AssemblyFixedStressAccumulationToMatrix(ls_mass, grid, timeStep, biot, delta, K, pShift)
-			AssemblyFixedStressAccumulationToVector(ls_mass, grid, timeStep, biot, delta, K, p_new, pShift)
+			AssemblyFixedStressAccumulationToMatrix(ls_mass, grid, timeStep, biot, delta, M, pShift)
+			AssemblyFixedStressAccumulationToVector(ls_mass, grid, timeStep, biot, delta, M, p_new, pShift)
 
 		AssemblyDarcyVelocitiesToMatrix(ls_mass, grid, mu, k, pShift)
 		AssemblyDarcyVelocitiesToVector(ls_mass, grid, mu, k, rho_f, g, pShift)
