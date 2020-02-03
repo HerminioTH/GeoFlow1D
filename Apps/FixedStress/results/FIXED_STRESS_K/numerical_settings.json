@@ -15,6 +15,6 @@
     "SplitMethod":
     {
         "Name": "FIXED_STRESS",
-        "Relaxation": 1.0
+        "Relaxation": 1.36
     }
 }

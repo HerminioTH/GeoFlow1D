@@ -54,6 +54,7 @@ def computeUndrainedSolution(grid, folder_settings):
 	p_old = ScalarField(n, ic.get("Initial Condition").get("Value_u"))
 	u_old = ScalarField(n, ic.get("Initial Condition").get("Value_p"))
 	g = ic.get("Gravity")
+	g = 0.0
 	# -----------------------------------------------------
 
 	# ------------- CREATE LINEAR SYSTEM ------------------

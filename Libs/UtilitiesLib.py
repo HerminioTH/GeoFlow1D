@@ -48,3 +48,11 @@ def computeNormL2(vector, grid):
 
 def computeNormInf(vector):
     return vector.max()
+
+def computeMedia(vector, period):
+    n = len(vector)
+    v = vector[max(n-period, 0):-1]
+    return sum(v)/len(v)
+
+def computeRate(error):
+    return (np.log10(error[0]) - np.log10(error[-1]))/len(error)

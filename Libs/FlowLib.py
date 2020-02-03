@@ -83,19 +83,7 @@ def AssemblyBiotAccumulationToVector(linearSystem, grid, timeStep, biotOnRegions
 			linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, value*p_old.getValue(fVertex))
 
 
-def AssemblyFixedStressAccumulationToMatrix(linearSystem, grid, timeStep, biotOnRegions, bulkModulusOnRegions, pShift=0):
-	n = grid.getNumberOfVertices()
-	for region in grid.getRegions():
-		alpha = biotOnRegions.getValue(region)
-		modulus = bulkModulusOnRegions.getValue(region)
-		for element in region.getElements():
-			bIndex = element.getVertices()[0].getIndex()
-			fIndex = element.getVertices()[1].getIndex()
-			value = (alpha*alpha/modulus)*element.getSubVolume()/timeStep
-			linearSystem.addValueToMatrix(bIndex + pShift*n, bIndex + pShift*n, value)
-			linearSystem.addValueToMatrix(fIndex + pShift*n, fIndex + pShift*n, value)
-
-def AssemblyFixedStressAccumulationToVector(linearSystem, grid, timeStep, biotOnRegions, bulkModulusOnRegions, p_old, pShift=0):
+def AssemblyFixedStressAccumulationToMatrix(linearSystem, grid, timeStep, biotOnRegions, deltaOnVertices, bulkModulusOnRegions, pShift=0):
 	n = grid.getNumberOfVertices()
 	for region in grid.getRegions():
 		alpha = biotOnRegions.getValue(region)
@@ -103,9 +91,25 @@ def AssemblyFixedStressAccumulationToVector(linearSystem, grid, timeStep, biotOn
 		for element in region.getElements():
 			bVertex = element.getVertices()[0]
 			fVertex = element.getVertices()[1]
+			bIndex = bVertex.getIndex()
+			fIndex = fVertex.getIndex()
 			value = (alpha*alpha/modulus)*element.getSubVolume()/timeStep
-			linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, value*p_old.getValue(bVertex))
-			linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, value*p_old.getValue(fVertex))
+			linearSystem.addValueToMatrix(bIndex + pShift*n, bIndex + pShift*n, value/deltaOnVertices.getValue(bVertex))
+			linearSystem.addValueToMatrix(fIndex + pShift*n, fIndex + pShift*n, value/deltaOnVertices.getValue(fVertex))
+
+def AssemblyFixedStressAccumulationToVector(linearSystem, grid, timeStep, biotOnRegions, deltaOnVertices, bulkModulusOnRegions, p_old, pShift=0):
+	n = grid.getNumberOfVertices()
+	for region in grid.getRegions():
+		alpha = biotOnRegions.getValue(region)
+		modulus = bulkModulusOnRegions.getValue(region)
+		for element in region.getElements():
+			bVertex = element.getVertices()[0]
+			fVertex = element.getVertices()[1]
+			bIndex = bVertex.getIndex()
+			fIndex = fVertex.getIndex()
+			value = (alpha*alpha/modulus)*element.getSubVolume()/timeStep
+			linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, value*p_old.getValue(bVertex)/deltaOnVertices.getValue(bVertex))
+			linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, value*p_old.getValue(fVertex)/deltaOnVertices.getValue(fVertex))
 
 
 def AssemblyVolumetricStrainToMatrix(linearSystem, grid, timeStep, biotOnRegions, pShift=0):
@@ -143,12 +147,36 @@ def AssemblyVolumetricStrainToVector(linearSystem, grid, timeStep, biotOnRegions
 	e = grid.getElements()[0]
 	r = grid.getRegions()[e.getParentRegionIndex()]
 	bVertex = e.getVertices()[0]
-	linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, -biotOnRegions.getValue(r)*u_old.getValue(bVertex)/timeStep)
+	linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, -biotOnRegions.getValue(r)*u_old.getValue(bVertex)/(20*timeStep))
 
 	e = grid.getElements()[-1]
 	r = grid.getRegions()[e.getParentRegionIndex()]
 	fVertex = e.getVertices()[1]
-	linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, biotOnRegions.getValue(r)*u_old.getValue(fVertex)/timeStep)
+	linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, biotOnRegions.getValue(r)*u_old.getValue(fVertex)/(20*timeStep))
 
+
+
+def AssemblyVolumetricStrainToVector2(linearSystem, grid, timeStep, biotOnRegions, u_new, u_old, pShift=0):
+	n = grid.getNumberOfVertices()
+	for region in grid.getRegions():
+		value = biotOnRegions.getValue(region)/(2*timeStep)
+		for e in region.getElements():
+			bVertex = e.getVertices()[0]
+			fVertex = e.getVertices()[1]
+			uob = u_old.getValue(bVertex)
+			uof = u_old.getValue(fVertex)
+			unb = u_new.getValue(bVertex)
+			unf = u_new.getValue(fVertex)
+			linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, value*(uob + uof - unb - unf))
+			linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, -value*(uob + uof - unb - unf))
+	e = grid.getElements()[0]
+	r = grid.getRegions()[e.getParentRegionIndex()]
+	bVertex = e.getVertices()[0]
+	linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, -biotOnRegions.getValue(r)*(u_old.getValue(bVertex) - u_new.getValue(bVertex))/timeStep)
+
+	e = grid.getElements()[-1]
+	r = grid.getRegions()[e.getParentRegionIndex()]
+	fVertex = e.getVertices()[1]
+	linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, biotOnRegions.getValue(r)*(u_old.getValue(fVertex) - u_new.getValue(fVertex))/timeStep)
 
 

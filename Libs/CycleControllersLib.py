@@ -52,4 +52,5 @@ class IterativeCycleController(object):
     def execute(self, error):
         self.iteNumber += 1
         if error < self.maxTol or self.iteNumber > self.maxIte:
+        # if self.iteNumber > self.maxIte:
             self.__keepCycle = False

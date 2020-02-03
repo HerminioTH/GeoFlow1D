@@ -7,6 +7,9 @@ from CycleControllersLib import *
 from ResultsHandlerLib import *
 from undrainedSolution import *
 from UtilitiesLib import *
+import numpy as np
+
+
 
 # ------------------ GRID DATA ------------------------
 L = 10
@@ -38,7 +41,7 @@ maxTol = num_set.get("IterativeCycle").get("Tolerance")
 timeHandler = TimeHandler(timeStep, finalTime, initialTime)
 iterativeController = IterativeCycleController(maxIte, maxTol)
 method_split = num_set.get("SplitMethod").get("Name")
-folder_results += method_split + "_M\\"
+folder_results += method_split + "_DELTA\\"
 # -----------------------------------------------------
 
 # -------------- PROPERTIES ---------------------------
@@ -112,8 +115,10 @@ res_p.saveField(timeHandler.getCurrentTime(), p_old.getField())
 res_u.saveField(timeHandler.getCurrentTime(), u_old.getField())
 timeHandler.advanceTime()
 
+rates = []
+isFirst = True
 while timeHandler.isFinalTimeReached():
-	timeHandler.printCurrentTime()
+##	timeHandler.printCurrentTime()
 	iterativeController.reset()
 	error_list = []
 	while iterativeController.keepCycling():
@@ -125,8 +130,8 @@ while timeHandler.isFinalTimeReached():
 		AssemblyBiotAccumulationToVector(ls_mass, grid, timeStep, biot, phi, cs, cf, p_old, pShift)
 
 		if method_split == "FIXED_STRESS":
-			AssemblyFixedStressAccumulationToMatrix(ls_mass, grid, timeStep, biot, delta, M, pShift)
-			AssemblyFixedStressAccumulationToVector(ls_mass, grid, timeStep, biot, delta, M, p_new, pShift)
+			AssemblyFixedStressAccumulationToMatrix(ls_mass, grid, timeStep, biot, delta, K, pShift)
+			AssemblyFixedStressAccumulationToVector(ls_mass, grid, timeStep, biot, delta, K, p_new, pShift)
 
 		AssemblyDarcyVelocitiesToMatrix(ls_mass, grid, mu, k, pShift)
 		AssemblyDarcyVelocitiesToVector(ls_mass, grid, mu, k, rho_f, g, pShift)
@@ -161,11 +166,27 @@ while timeHandler.isFinalTimeReached():
 		error_list.append(L2_mass)
 		iterativeController.execute(max(L2_mass, L2_geom))
 
+	r = (np.log10(error_list[1]) - np.log10(error_list[-1]))/len(error_list)
+	rates.append(r)
+	# print error_list
+	try:		m5 = computeMedia(rates, 5)
+	except:		m5 = r
+
+	try:		m10 = computeMedia(rates, 10)
+	except:		m10 = r
+	print timeHandler.getCurrentTime(), len(error_list), r, m5, m10
+
+
+	if not isFirst:
+		d = float(raw_input("Delta: "))
+		delta = ScalarField(grid.getNumberOfVertices(), d)
+	isFirst = False
+
 	res_error.saveField(timeHandler.getCurrentTime(), np.array(error_list))
 
-	print "Ite: %i"%iterativeController.iteNumber
-	print "L2_mass: %e"%L2_mass
-	print "L2_geom: %e"%L2_geom
+##	print "Ite: %i"%iterativeController.iteNumber
+##	print "L2_mass: %e"%L2_mass
+##	print "L2_geom: %e"%L2_geom
 
 
 	p_old.setField(p_new.getField())
