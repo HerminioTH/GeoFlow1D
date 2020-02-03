@@ -38,7 +38,7 @@ maxTol = num_set.get("IterativeCycle").get("Tolerance")
 timeHandler = TimeHandler(timeStep, finalTime, initialTime)
 iterativeController = IterativeCycleController(maxIte, maxTol)
 method_split = num_set.get("SplitMethod").get("Name")
-folder_results += method_split + "_M\\"
+folder_results += method_split + "\\"
 # -----------------------------------------------------
 
 # -------------- PROPERTIES ---------------------------

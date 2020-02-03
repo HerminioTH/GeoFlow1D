@@ -3,14 +3,19 @@
     {
         "Unit": "SECOND",
         "TimeStep": 1.0e0,
-        "FinalTime": 1.0e2,
+        "FinalTime": 5.0e1,
         "InitialTime": 0.0,
         "Tolerance": 1.0e-12
     },
     "IterativeCycle":
     {
-        "MaximumNumberOfIterations": 50,
-        "Tolerance": 1.0e-8
+        "MaximumNumberOfIterations": 500,
+        "Tolerance": 1.0e-5
     },
-    "SplitMethod": "FIXED_STRESS"
+    "SplitMethod":
+    {
+        "Name": "FIXED_STRESS",
+        "Relaxation": 1.0,
+        "Manual": false
+    }
 }

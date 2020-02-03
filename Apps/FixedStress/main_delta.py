@@ -28,7 +28,7 @@ grid = Grid_1D(gridData)
 
 # ---------------- FOLDER SETTINGS --------------------
 folder_settings = "settings\\"
-folder_results = "results\\"
+folder_results = "results\\Case_3\\"
 # -----------------------------------------------------
 
 # -------------- NUMERICAL SETTINGS -------------------
@@ -41,7 +41,11 @@ maxTol = num_set.get("IterativeCycle").get("Tolerance")
 timeHandler = TimeHandler(timeStep, finalTime, initialTime)
 iterativeController = IterativeCycleController(maxIte, maxTol)
 method_split = num_set.get("SplitMethod").get("Name")
-folder_results += method_split + "_DELTA\\"
+manual = num_set.get("SplitMethod").get("Manual")
+if method_split == "FIXED_STRAIN":
+	folder_results += method_split + "\\"
+else:
+	folder_results += method_split + "_" + str(manual) + "\\"
 # -----------------------------------------------------
 
 # -------------- PROPERTIES ---------------------------
@@ -168,19 +172,17 @@ while timeHandler.isFinalTimeReached():
 
 	r = (np.log10(error_list[1]) - np.log10(error_list[-1]))/len(error_list)
 	rates.append(r)
-	# print error_list
-	try:		m5 = computeMedia(rates, 5)
+	try:		m5 = computeMedia(rates, 3)
 	except:		m5 = r
-
-	try:		m10 = computeMedia(rates, 10)
+	try:		m10 = computeMedia(rates, 5)
 	except:		m10 = r
 	print timeHandler.getCurrentTime(), len(error_list), r, m5, m10
 
-
-	if not isFirst:
-		d = float(raw_input("Delta: "))
-		delta = ScalarField(grid.getNumberOfVertices(), d)
-	isFirst = False
+	if manual:
+		if not isFirst:
+			d = float(raw_input("Delta: "))
+			delta = ScalarField(grid.getNumberOfVertices(), d)
+		isFirst = False
 
 	res_error.saveField(timeHandler.getCurrentTime(), np.array(error_list))
 
@@ -213,3 +215,4 @@ for region in grid.getRegions():
 print "Equilibrium pressure is: %f Pa"%p_eq
 
 print "Delta = ", 1. + 4*G/bulk/3.
+print folder_results

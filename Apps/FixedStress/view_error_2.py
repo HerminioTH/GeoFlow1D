@@ -29,6 +29,17 @@ def plotRate(res, ax):
 	ax.set_ylabel("Rate")
 	ax.grid(True)
 
+def plotIterations(res, ax):
+	ite = []
+	for t in res.times:
+		error = res.getSolutionAtTime(t)
+		ite.append(len(error))
+	# ax.semilogy(res.times, rate, 'o-')
+	ax.plot(res.times, ite, '.-')
+	ax.set_xlabel("Time")
+	ax.set_ylabel("Number of Iterations")
+	ax.grid(True)
+
 def plotMediaMovel(res, ax, period):
 	rate = []
 	for t in res.times:
@@ -36,7 +47,6 @@ def plotMediaMovel(res, ax, period):
 		rate.append(computeRate(error))
 	line = []
 	time = []
-	print len(rate)
 	for i in range(2, len(rate)):
 		time.append((res.times[i] + res.times[i-1])/2.)
 		media = computeMedia(rate[:i], period)
@@ -50,24 +60,26 @@ def plotMediaMovel(res, ax, period):
 
 
 def main():
-	names = ["FIXED_STRAIN\\",
-			"FIXED_STRESS_K\\",
-			"FIXED_STRESS_M\\"]
+	names = ["Case_1\\FIXED_STRAIN\\",
+			"Case_2\\FIXED_STRESS_False\\",
+			"Case_3\\FIXED_STRESS_True\\"]
 	nNames = len(names)
 
 	folderName = "results\\"
-	times = [1, 10, 30, -1]
+	times = [1, 10, 20, -1]
 	period = 50
 
-	fig, axes = plt.subplots(nNames, 2, figsize=(20,20))
+	fig, axes = plt.subplots(nNames, 3, figsize=(18,10))
 	fig.subplots_adjust(left=0.060, right=0.975, top=0.965, bottom=0.125)
 	fonts = {'fontname': 'serif'}
 	fontSize = 14
 
 	for i,name in enumerate(names):
+		print name
 		res_e = ReadResults(folderName + name + "error.txt")
 		plotError(res_e, axes[i][0], times)
 		plotRate(res_e, axes[i][1])
+		plotIterations(res_e, axes[0][2])
 		plotMediaMovel(res_e, axes[i][1], 5)
 		plotMediaMovel(res_e, axes[i][1], 10)
 		plotMediaMovel(res_e, axes[i][1], 20)
