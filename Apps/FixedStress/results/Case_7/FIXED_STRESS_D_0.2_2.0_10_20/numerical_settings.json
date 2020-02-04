@@ -1,0 +1,25 @@
+{
+    "TransientCycle":
+    {
+        "Unit": "SECOND",
+        "TimeStep": 1.0e0,
+        "FinalTime": 1.0e3,
+        "InitialTime": 0.0,
+        "Tolerance": 1.0e-12
+    },
+    "IterativeCycle":
+    {
+        "MaximumNumberOfIterations": 500,
+        "Tolerance": 1.0e-9
+    },
+    "SplitMethod":
+    {
+        "Name": "FIXED_STRESS_D",
+        "Manual": false,
+        "Relaxation": 1.0,
+        "Step": 0.2,
+        "Factor": 2.0,
+        "Media1": 10,
+        "Media2": 20
+    }
+}

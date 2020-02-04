@@ -5,39 +5,6 @@ from UtilitiesLib import *
 from ResultsHandlerLib import *
 import numpy as np
 
-def plotError(res, ax, times):
-	for t in times:
-		error = res.getSolutionAtTime(res.times[t])
-		ite = range(len(error))
-		ax.semilogy(ite, error, 'o-')
-	ax.set_xlabel("Iteration number")
-	ax.set_ylabel("Error")
-	ax.grid(True)
-
-def plotRate(res, ax, name):
-	rate = []
-	for t in res.times:
-		error = res.getSolutionAtTime(t)
-		rate.append(computeRate(error))
-	# ax.semilogy(res.times, rate, 'o-')
-	ax.plot(res.times, rate, '.-', label=name)
-	ax.set_xlabel("Time")
-	ax.set_ylabel("Rate")
-	ax.grid(True)
-	ax.legend(loc=0)
-
-def plotIterations(res, ax, name):
-	ite = []
-	for t in res.times:
-		error = res.getSolutionAtTime(t)
-		ite.append(len(error))
-	# ax.semilogy(res.times, rate, 'o-')
-	ax.plot(res.times, ite, '.-', label=name)
-	ax.set_xlabel("Time")
-	ax.set_ylabel("Number of Iterations")
-	ax.grid(True)
-	ax.legend(loc=0)
-
 def plotMediaMovel(res, ax, period):
 	rate = []
 	for t in res.times:
@@ -51,6 +18,74 @@ def plotMediaMovel(res, ax, period):
 		line.append(media)
 	ax.plot(time, line, '-')#, label="MM %i"%period)
 
+def plotError(res, ax, times):
+	for t in times:
+		error = res.getSolutionAtTime(res.times[t])
+		ite = range(len(error))
+		ax.semilogy(ite, error, '.-')
+	ax.set_xlabel("Iteration number")
+	ax.set_ylabel("Error")
+	ax.grid(True)
+
+def plotRate(res, ax, fileName):
+	rate = []
+	for t in res.times:
+		error = res.getSolutionAtTime(t)
+		rate.append(computeRate(error))
+	pos = fileName.find("STR")
+	name = fileName[pos+7:-1]
+	# ax.semilogy(res.times, rate, 'o-')
+	ax.plot(res.times, rate, '.-', label=name)
+	ax.set_xlabel("Time")
+	ax.set_ylabel("Rate")
+	ax.grid(True)
+	ax.legend(loc=0)
+
+def plotIterations(res, ax, fileName):
+	ite = []
+	for t in res.times:
+		error = res.getSolutionAtTime(t)
+		ite.append(len(error))
+	pos = fileName.find("STR")
+	name = fileName[pos+7:-1]
+	# ax.loglog(res.times, ite, '.-', label=name)
+	ax.semilogy(res.times, ite, '.-', label=name)
+	# ax.plot(res.times, ite, '.-', label=name)
+	ax.set_xlabel("Time")
+	ax.set_ylabel("Number of Iterations")
+	ax.grid(True)
+	ax.legend(loc=0)
+
+def plotMAXIterations(res, ax, fileName):
+	ite = [0]
+	for t in res.times:
+		error = res.getSolutionAtTime(t)
+		ite.append(ite[-1] + len(error))
+	pos = fileName.find("STR")
+	name = fileName[pos+7:-1]
+	# ax.loglog(res.times, ite[1:], '.-', label=name)
+	# ax.semilogy(res.times, ite[1:], '.-', label=name)
+	ax.plot(res.times, ite[1:], '.-', label=name)
+	ax.set_xlabel("Time")
+	ax.set_ylabel("Number of Iterations")
+	ax.grid(True)
+	ax.legend(loc=0)
+
+def plotDeltas(res, ax, fileName):
+	deltas = []
+	# for t in res.times:
+	[deltas.append(res.getSolutionAtTime(t)[0]) for t in res.times]
+	pos = fileName.find("STR")
+	name = fileName[pos+7:-1]
+	# ax.loglog(res.times, ite[1:], '.-', label=name)
+	# ax.semilogy(res.times, ite[1:], '.-', label=name)
+	ax.plot(res.times, deltas, '.-', label=name)
+	ax.set_xlabel("Time")
+	ax.set_ylabel("Delta")
+	ax.grid(True)
+	ax.legend(loc=0)
+
+
 
 
 
@@ -58,48 +93,53 @@ def plotMediaMovel(res, ax, period):
 
 
 def main():
-	# names = ["Case_1\\FIXED_STRAIN\\",
-	# 		"Case_3\\FIXED_STRESS_False\\",
-	# 		"Case_3\\FIXED_STRESS_True\\"]
-	names = ["Case_3\\FIXED_STRESS_False_K\\",
-			"Case_3\\FIXED_STRESS_False_M\\",
-			"Case_3\\FIXED_STRESS_True_v1\\",
-			"Case_3\\FIXED_STRESS_True_v2\\",
-			"Case_3\\FIXED_STRESS_True\\"]
+	names = [
+				"Case_10_SC\\FIXED_STRESS_K\\",
+				"Case_10_SC\\FIXED_STRESS_M\\",
+				"Case_10_SC\\FIXED_STRESS_D_0.2_2.0_10_20\\",
+				"Case_10_SC\\FIXED_STRESS_D_0.2_2.0_10_20_noRestart\\",
+				"Case_10_SC\\FIXED_STRESS_D_0.2_2.0_10_20_Restart\\"
+				# "Case_8_WC\\FIXED_STRESS_D_0.2_2.0_10_20_noRestart\\",
+				# "Case_8_WC\\FIXED_STRESS_D_0.2_2.0_10_20_Restart\\",
+				# "Case_9_WC\\FIXED_STRESS_D_0.2_2.0_10_20\\"
+				# "Case_8\\FIXED_STRESS_D_0.2_2.0_3_5\\",
+				# "Case_8\\FIXED_STRESS_D_0.2_2.0_3_5_noRestart\\",
+				# "Case_8\\FIXED_STRESS_D_0.2_2.0_3_5_Restart\\"
+				# "Case_5\\FIXED_STRESS_D_0.2_5.0_100_200\\",
+				# "Case_5\\FIXED_STRESS_D_0.5_5.0_5_10\\",
+				# "Case_5\\FIXED_STRESS_D_0.2_2.0_5_10\\"
+			]
 	nNames = len(names)
 
 	folderName = "results\\"
-	times = [1, 5, 10, 20, -1]
-	period = 50
+	times = [100, 200, -1]
 
-	fig = plt.figure(figsize=(18,10))
+	fig = plt.figure(figsize=(21,13))
 	fig.subplots_adjust(left=0.060, right=0.975, top=0.965, bottom=0.08, )
-	gs = gridspec.GridSpec(nNames, 3)
-	axIte = fig.add_subplot(gs[:,-1])
+	nCols = 3
+	nRows = nNames
+	gs = gridspec.GridSpec(nRows, nCols)
+	stop = nRows/2
+	axIte = fig.add_subplot(gs[stop:,-1])
+	axMAX = fig.add_subplot(gs[:stop,-1])
+	axRATE = fig.add_subplot(gs[stop:,-2])
+	axDELTA = fig.add_subplot(gs[:stop,-2])
 
 	for i,name in enumerate(names):
 		print i, name
 		ax1 = fig.add_subplot(gs[i,0])
-		ax2 = fig.add_subplot(gs[i,1])
+		# ax2 = fig.add_subplot(gs[i,1])
 		res_e = ReadResults(folderName + name + "error.txt")
+		res_d = ReadResults(folderName + name + "delta.txt")
 		plotError(res_e, ax1, times)
-		plotRate(res_e, ax2, name)
-		plotMediaMovel(res_e, ax2, 3)
-		plotMediaMovel(res_e, ax2, 5)
-		plotMediaMovel(res_e, ax2, 10)
+		# plotRate(res_e, ax2, name)
+		plotRate(res_e, axRATE, name)
+		plotDeltas(res_d, axDELTA, name)
+		# plotMediaMovel(res_e, ax2, 10)
+		# plotMediaMovel(res_e, ax2, 20)
+		# plotMediaMovel(res_e, ax2, 10)
 		plotIterations(res_e, axIte, name)
-
-
-	# for i,name in enumerate(names):
-	# 	print name
-	# 	res_e = ReadResults(folderName + name + "error.txt")
-	# 	plotError(res_e, axes[i][0], times)
-	# 	plotRate(res_e, axes[i][1])
-	# 	plotIterations(res_e, axes[0][2])
-	# 	plotIterations(res_e, axes[i][2])
-	# 	plotMediaMovel(res_e, axes[i][1], 5)
-	# 	plotMediaMovel(res_e, axes[i][1], 10)
-	# 	plotMediaMovel(res_e, axes[i][1], 20)
+		plotMAXIterations(res_e, axMAX, name)
 
 	plt.legend(loc=0)
 	plt.show()

@@ -147,12 +147,12 @@ def AssemblyVolumetricStrainToVector(linearSystem, grid, timeStep, biotOnRegions
 	e = grid.getElements()[0]
 	r = grid.getRegions()[e.getParentRegionIndex()]
 	bVertex = e.getVertices()[0]
-	linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, -biotOnRegions.getValue(r)*u_old.getValue(bVertex)/(20*timeStep))
+	linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, -biotOnRegions.getValue(r)*u_old.getValue(bVertex)/(1*timeStep))
 
 	e = grid.getElements()[-1]
 	r = grid.getRegions()[e.getParentRegionIndex()]
 	fVertex = e.getVertices()[1]
-	linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, biotOnRegions.getValue(r)*u_old.getValue(fVertex)/(20*timeStep))
+	linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, biotOnRegions.getValue(r)*u_old.getValue(fVertex)/(1*timeStep))
 
 
 

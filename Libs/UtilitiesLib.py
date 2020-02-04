@@ -56,3 +56,4 @@ def computeMedia(vector, period):
 
 def computeRate(error):
     return (np.log10(error[0]) - np.log10(error[-1]))/len(error)
+

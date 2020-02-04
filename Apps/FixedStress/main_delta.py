@@ -7,7 +7,25 @@ from CycleControllersLib import *
 from ResultsHandlerLib import *
 from undrainedSolution import *
 from UtilitiesLib import *
+from Delta import *
 import numpy as np
+
+def computeDimensionalTime(fluid, solid, L):
+	mu = fluid.get("WATER").get("Viscosity").get("value")
+	CF = fluid.get("WATER").get("Compressibility").get("value")
+	for region in grid.getRegions():
+		G = solid.get("ROCK_1").get("ShearModulus").get("value")
+		nu = solid.get("ROCK_1").get("PoissonsRatio").get("value")
+		bulk = 2*G*(1 + nu)/(3*(1 - 2*nu))
+		CS = solid.get("ROCK_1").get("Compressibility").get("value")
+		phi_value = solid.get("ROCK_1").get("Porosity").get("value")
+		alpha = 1 - CS*bulk
+		mv = 1./M
+		k = solid.get("ROCK_1").get("Permeability").get("value")
+		Q = 1.0/(phi_value*CF + CS*(alpha - phi_value))
+		c_v = (Q/((alpha**2)*Q*mv + 1.0))*(k/mu)
+		time = (L**2)/c_v
+	return time
 
 
 
@@ -28,7 +46,7 @@ grid = Grid_1D(gridData)
 
 # ---------------- FOLDER SETTINGS --------------------
 folder_settings = "settings\\"
-folder_results = "results\\Case_3\\"
+folder_results = "results\\Case_9_WC\\"
 # -----------------------------------------------------
 
 # -------------- NUMERICAL SETTINGS -------------------
@@ -40,12 +58,29 @@ maxIte = num_set.get("IterativeCycle").get("MaximumNumberOfIterations")
 maxTol = num_set.get("IterativeCycle").get("Tolerance")
 timeHandler = TimeHandler(timeStep, finalTime, initialTime)
 iterativeController = IterativeCycleController(maxIte, maxTol)
+# -----------------------------------------------------
+
+
+# -------------- SPLITTING SETTINGS -------------------
+step = num_set.get("SplitMethod").get("Step")
+reductionFactor = num_set.get("SplitMethod").get("Factor")
+mediaMovel1 = num_set.get("SplitMethod").get("Media1")
+mediaMovel2 = num_set.get("SplitMethod").get("Media2")
+d = num_set.get("SplitMethod").get("Relaxation")
+delta = Delta(d, step, reductionFactor)
+deltaField = ScalarField(grid.getNumberOfVertices(), d)
+# deltaField = ScalarField(grid.getNumberOfVertices(), 1. + 4*G/bulk/3.)
 method_split = num_set.get("SplitMethod").get("Name")
 manual = num_set.get("SplitMethod").get("Manual")
-if method_split == "FIXED_STRAIN":
-	folder_results += method_split + "\\"
+if method_split == "FIXED_STRESS_D":
+	folder_results += method_split
+	folder_results += "_" + str(step)
+	folder_results += "_" + str(reductionFactor)
+	folder_results += "_" + str(mediaMovel1)
+	folder_results += "_" + str(mediaMovel2)
+	folder_results += "\\"
 else:
-	folder_results += method_split + "_" + str(manual) + "\\"
+	folder_results += method_split + "\\"
 # -----------------------------------------------------
 
 # -------------- PROPERTIES ---------------------------
@@ -74,13 +109,9 @@ for region in grid.getRegions():
 	K.setValue(region, bulk)
 	CS = solid.get("ROCK_1").get("Compressibility").get("value")
 	biot.setValue(region, 1 - CS*bulk)
-
 rho = ScalarField(grid.getNumberOfRegions())
 for r in grid.getRegions():
 	rho.setValue(r, phi.getValue(r)*rho_f + (1 - phi.getValue(r))*rho_s.getValue(r))
-delta = ScalarField(grid.getNumberOfVertices(), num_set.get("SplitMethod").get("Relaxation"))
-# delta = ScalarField(grid.getNumberOfVertices(), 1. + 4*G/bulk/3.)
-# delta = ScalarField(grid.getNumberOfVertices(), 1.0)
 # -----------------------------------------------------
 
 # ---------------- INITIAL FIELDS ---------------------
@@ -111,6 +142,7 @@ bound_u = getJsonData(folder_settings + "BC_u.json")
 res_p = SaveResults(grid, "p.txt", folder_results, 'Pressure', 'Pa')
 res_u = SaveResults(grid, "u.txt", folder_results, 'Displacement', 'm')
 res_error = SaveResults(grid, "error.txt", folder_results, 'Error', '-')
+res_delta = SaveResults(grid, "delta.txt", folder_results, 'delta', '-')
 res_u.copySettings(folder_settings, folder_results)
 # -----------------------------------------------------
 
@@ -120,7 +152,7 @@ res_u.saveField(timeHandler.getCurrentTime(), u_old.getField())
 timeHandler.advanceTime()
 
 rates = []
-isFirst = True
+counter = 0
 while timeHandler.isFinalTimeReached():
 ##	timeHandler.printCurrentTime()
 	iterativeController.reset()
@@ -133,9 +165,14 @@ while timeHandler.isFinalTimeReached():
 		AssemblyBiotAccumulationToMatrix(ls_mass, grid, timeStep, biot, phi, cs, cf, pShift)
 		AssemblyBiotAccumulationToVector(ls_mass, grid, timeStep, biot, phi, cs, cf, p_old, pShift)
 
-		if method_split == "FIXED_STRESS":
-			AssemblyFixedStressAccumulationToMatrix(ls_mass, grid, timeStep, biot, delta, M, pShift)
-			AssemblyFixedStressAccumulationToVector(ls_mass, grid, timeStep, biot, delta, M, p_new, pShift)
+		if method_split == "FIXED_STRESS_K" or method_split == "FIXED_STRESS_D":
+			AssemblyFixedStressAccumulationToMatrix(ls_mass, grid, timeStep, biot, deltaField, K, pShift)
+			AssemblyFixedStressAccumulationToVector(ls_mass, grid, timeStep, biot, deltaField, K, p_new, pShift)
+		elif method_split == "FIXED_STRESS_M":
+			AssemblyFixedStressAccumulationToMatrix(ls_mass, grid, timeStep, biot, deltaField, M, pShift)
+			AssemblyFixedStressAccumulationToVector(ls_mass, grid, timeStep, biot, deltaField, M, p_new, pShift)
+		else:
+			pass
 
 		AssemblyDarcyVelocitiesToMatrix(ls_mass, grid, mu, k, pShift)
 		AssemblyDarcyVelocitiesToVector(ls_mass, grid, mu, k, rho_f, g, pShift)
@@ -147,8 +184,19 @@ while timeHandler.isFinalTimeReached():
 		ls_mass.applyBoundaryConditionsToVector(grid, bound_p, pShift)
 
 		ls_mass.solve()
-		error = p_new.getField() - ls_mass.getSolution()
-		L2_mass = computeNormL2(error, grid)
+
+		# if len(error_list) == 0:
+		# 	denominator = computeNormL2(p_old.getField() - ls_mass.getSolution(), grid)
+		# error = (p_new.getField() - ls_mass.getSolution())#/max(1, denominator)
+		# L2_mass = computeNormL2(error, grid)
+		# p_new.setField(ls_mass.getSolution())
+
+		numerator = computeNormL2(p_new.getField() - ls_mass.getSolution(), grid)
+		if len(error_list) == 0:
+			denominator = computeNormL2(p_old.getField() - ls_mass.getSolution(), grid)
+			if denominator == 0.: denominator = 1
+		# L2_mass = numerator/denominator
+		L2_mass = numerator/max(1,denominator)
 		p_new.setField(ls_mass.getSolution())
 		# -----------------------------------------------------
 
@@ -170,26 +218,26 @@ while timeHandler.isFinalTimeReached():
 		error_list.append(L2_mass)
 		iterativeController.execute(max(L2_mass, L2_geom))
 
-	r = (np.log10(error_list[1]) - np.log10(error_list[-1]))/len(error_list)
-	rates.append(r)
-	try:		m5 = computeMedia(rates, 3)
-	except:		m5 = r
-	try:		m10 = computeMedia(rates, 5)
-	except:		m10 = r
-	print timeHandler.getCurrentTime(), len(error_list), r, m5, m10
+	rate = computeRate(error_list)
+	rates.append(rate)
+	try:		media1 = computeMedia(rates, mediaMovel1)
+	except:		media1 = rate
+	try:		media2 = computeMedia(rates, mediaMovel2)
+	except:		media2 = rate
 
-	if manual:
-		if not isFirst:
+	if method_split == "FIXED_STRESS_D" and manual == False:
+		d = delta.computeDelta(rate, media1, media2)
+		deltaField = ScalarField(grid.getNumberOfVertices(), d)
+	elif method_split == "FIXED_STRESS_D" and manual == True:
+		if counter > 3:
 			d = float(raw_input("Delta: "))
-			delta = ScalarField(grid.getNumberOfVertices(), d)
-		isFirst = False
+			deltaField = ScalarField(grid.getNumberOfVertices(), d)
+		counter += 1
+
+	print timeHandler.getCurrentTime(), len(error_list), d, rate, denominator
 
 	res_error.saveField(timeHandler.getCurrentTime(), np.array(error_list))
-
-##	print "Ite: %i"%iterativeController.iteNumber
-##	print "L2_mass: %e"%L2_mass
-##	print "L2_geom: %e"%L2_geom
-
+	res_delta.saveField(timeHandler.getCurrentTime(), np.array([d]))
 
 	p_old.setField(p_new.getField())
 	u_old.setField(u_new.getField())

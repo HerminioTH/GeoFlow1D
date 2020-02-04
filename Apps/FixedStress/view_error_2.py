@@ -34,7 +34,7 @@ def plotIterations(res, ax):
 	for t in res.times:
 		error = res.getSolutionAtTime(t)
 		ite.append(len(error))
-	# ax.semilogy(res.times, rate, 'o-')
+	# ax.semilogy(res.times, ite, '.-')
 	ax.plot(res.times, ite, '.-')
 	ax.set_xlabel("Time")
 	ax.set_ylabel("Number of Iterations")
