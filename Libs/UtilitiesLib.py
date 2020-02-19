@@ -52,7 +52,10 @@ def computeNormInf(vector):
 def computeMedia(vector, period):
     n = len(vector)
     v = vector[max(n-period, 0):-1]
-    return sum(v)/len(v)
+    if len(v) > 0:
+        return sum(v)/len(v)
+    else:
+        return v[-1]
 
 def computeRate(error):
     return (np.log10(error[0]) - np.log10(error[-1]))/len(error)

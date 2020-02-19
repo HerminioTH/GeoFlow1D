@@ -50,7 +50,7 @@ class IterativeCycleController(object):
         self.iteNumber = 0
 
     def execute(self, error):
-        self.iteNumber += 1
         if error < self.maxTol or self.iteNumber > self.maxIte:
-        # if self.iteNumber > self.maxIte:
-            self.__keepCycle = False
+            if self.iteNumber > 1:
+                self.__keepCycle = False
+        self.iteNumber += 1

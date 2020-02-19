@@ -1,13 +1,14 @@
 from UtilitiesLib import computeMedia
 
 class Delta(object):
-	def __init__(self, delta_initial, step, factor=10.):
+	def __init__(self, delta_initial, step, factor=10., restart=True):
 		self.delta = delta_initial
 		self.deltas = [self.delta]
 		self.rates = []
 		self.initialStep = step
 		self.step = self.initialStep
 		self.factor = factor
+		self.restart = restart
 		self.counter = 0
 		self.reduceCounter = 0
 
@@ -24,11 +25,12 @@ class Delta(object):
 					delta_medio = computeMedia(self.deltas, 10)
 				else:
 					delta_medio = 2*self.delta
-				if rate<media1 and rate<media2 and abs(self.delta - delta_medio)<1e-6:
-					self.step = self.initialStep
-					print "----------------------------------"
-					print "----------- RESTART --------------"
-					print "-----------" + str(self.step) + "--------------"
+				if self.restart:
+					if rate<media1 and rate<media2 and abs(self.delta - delta_medio)<1e-6:
+						self.step = self.initialStep
+						print "----------------------------------"
+						print "----------- RESTART --------------"
+						print "-----------" + str(self.step) + "--------------"
 				self.__reverse()
 				self.__increase()
 		return self.delta

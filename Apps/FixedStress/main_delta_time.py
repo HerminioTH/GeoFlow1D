@@ -10,6 +10,8 @@ from UtilitiesLib import *
 from Delta import *
 import numpy as np
 
+
+
 def computeDimensionalTime(fluid, solid, L):
 	mu = fluid.get("WATER").get("Viscosity").get("value")
 	CF = fluid.get("WATER").get("Compressibility").get("value")
@@ -31,7 +33,7 @@ def computeDimensionalTime(fluid, solid, L):
 
 # ------------------ GRID DATA ------------------------
 L = 10
-nVertices = 15
+nVertices = 7
 nodesCoord, elemConn = createGridData(L, nVertices)
 gridData = GridData()
 gridData.setElementConnectivity(elemConn)
@@ -46,7 +48,7 @@ grid = Grid_1D(gridData)
 
 # ---------------- FOLDER SETTINGS --------------------
 folder_settings = "settings\\"
-folder_results = "results\\Case_10_SC\\"
+folder_results = "results\\TESTE\\"
 # -----------------------------------------------------
 
 # -------------- PROPERTIES ---------------------------
@@ -97,8 +99,8 @@ step = num_set.get("SplitMethod").get("Step")
 reductionFactor = num_set.get("SplitMethod").get("Factor")
 mediaMovel1 = num_set.get("SplitMethod").get("Media1")
 mediaMovel2 = num_set.get("SplitMethod").get("Media2")
-# d = num_set.get("SplitMethod").get("Relaxation")
-d = 1. + 4*G/bulk/3.
+d = num_set.get("SplitMethod").get("Relaxation")
+# d = 1. + 4*G/bulk/3.
 delta = Delta(d, step, reductionFactor)
 deltaField = ScalarField(grid.getNumberOfVertices(), d)
 method_split = num_set.get("SplitMethod").get("Name")
@@ -184,19 +186,15 @@ while timeHandler.isFinalTimeReached():
 		ls_mass.applyBoundaryConditionsToVector(grid, bound_p, pShift)
 
 		ls_mass.solve()
+		# -----------------------------------------------------
 
-		# if len(error_list) == 0:
-		# 	denominator = computeNormL2(p_old.getField() - ls_mass.getSolution(), grid)
-		# error = (p_new.getField() - ls_mass.getSolution())#/max(1, denominator)
-		# L2_mass = computeNormL2(error, grid)
-		# p_new.setField(ls_mass.getSolution())
 
+		# ----------------- RELATIVE ERROR --------------------
 		numerator = computeNormL2(p_new.getField() - ls_mass.getSolution(), grid)
 		if len(error_list) == 0:
 			denominator = computeNormL2(p_old.getField() - ls_mass.getSolution(), grid)
 			if denominator == 0.: denominator = 1
 		L2_mass = numerator/denominator
-		# L2_mass = numerator/max(1,denominator)
 		p_new.setField(ls_mass.getSolution())
 		# -----------------------------------------------------
 
@@ -210,16 +208,25 @@ while timeHandler.isFinalTimeReached():
 		ls_geom.applyBoundaryConditionsToVector(grid, bound_u, uShift)
 
 		ls_geom.solve()
-		error = u_new.getField() - ls_geom.getSolution()
-		L2_geom = computeNormL2(error, grid)
+		# L2_geom = computeNormL2(u_new.getField() - ls_geom.getSolution(), grid)
+		# u_new.setField(ls_geom.getSolution())
+		# -----------------------------------------------------
+
+		# ----------------- RELATIVE ERROR --------------------
+		numerator = computeNormL2(u_new.getField() - ls_geom.getSolution(), grid)
+		if len(error_list) == 0:
+			denominator_geom = computeNormL2(u_old.getField() - ls_geom.getSolution(), grid)
+			if denominator_geom == 0.: denominator_geom = 1
+		L2_geom = numerator/denominator_geom
 		u_new.setField(ls_geom.getSolution())
 		# -----------------------------------------------------
 
 		error_list.append(L2_mass)
-		iterativeController.execute(max(L2_mass, L2_geom))
+		iterativeController.execute(L2_mass)
 
 	rate = computeRate(error_list)
 	rates.append(rate)
+	# print rates, error_list
 	try:		media1 = computeMedia(rates, mediaMovel1)
 	except:		media1 = rate
 	try:		media2 = computeMedia(rates, mediaMovel2)
@@ -234,7 +241,16 @@ while timeHandler.isFinalTimeReached():
 			deltaField = ScalarField(grid.getNumberOfVertices(), d)
 		counter += 1
 
-	print timeHandler.getCurrentTime(), len(error_list), d, rate, denominator
+
+
+
+
+
+
+
+
+	# print timeHandler.getCurrentTime(), len(error_list), d, rate, denominator, L2_mass, L2_geom
+	print d
 
 	res_error.saveField(timeHandler.getCurrentTime(), np.array(error_list))
 	res_delta.saveField(timeHandler.getCurrentTime(), np.array([d]))

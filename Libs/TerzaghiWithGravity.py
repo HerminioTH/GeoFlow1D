@@ -180,21 +180,7 @@ class Solution( object ):
             pressureValue = self.rho_f*self.g*position + 4.0*barP0*summationResult / math.pi
             return pressureValue
 
-    # def getPressureValue( self, yPosition, time, numberOfSummationTerms = 200 ):
-    #     position = self.height - yPosition;
-    #     if time == 0.0:
-    #         pressureValue = self._calculate_p_0(yPosition);
-    #         return pressureValue
-    #     else:
-    #         summationResult = 0
-    #         for j in range(0, numberOfSummationTerms):
-    #             term_1 = 1.0 / (2.0*j + 1.0)
-    #             term_2 = math.exp( -(time*self.c*(math.pi**2)*(2.0*j + 1.0)**2.0 ) / (4.0*self.height**2.0) )
-    #             term_3 = math.cos( math.pi*position*(2.0*j + 1) / (2.0*self.height) )
-    #             summationResult += term_1*term_2*term_3
-    #         barP0 = self._calculate_p_0(self.height)
-    #         pressureValue = self.rho_f*self.g*position + 4.0*barP0*summationResult / math.pi
-    #         return pressureValue
+
 
     def getDisplacementValue( self, yPosition, time, numberOfSummationTerms = 200 ):
         position = self.height - yPosition;
@@ -239,9 +225,6 @@ class Solution( object ):
         pressureValues = np.zeros(ny);
         for i in range( 0, size ):
             pressureValues[i] = self.getPressureValue( positionValues[ i ], time, numberOfSummationTerms )
-            # pressureValue = self.getPressureValue( positionValues[ i ], time, numberOfSummationTerms );
-            # pressureValues.append( pressureValue );
-        # return np.array(pressureValues)
         return pressureValues
 
     def getDisplacementValuesConstTime( self, time, numberOfSummationTerms = 200, ny = 200 ):
