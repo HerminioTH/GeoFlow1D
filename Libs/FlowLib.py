@@ -112,6 +112,43 @@ def AssemblyFixedStressAccumulationToVector(linearSystem, grid, timeStep, biotOn
 			linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, value*p_old.getValue(fVertex)/deltaOnVertices.getValue(fVertex))
 
 
+
+
+
+
+
+
+def AssemblyFixedStressAccumulationToMatrix_2(linearSystem, grid, timeStep, biotOnRegions, deltaOnRegions, bulkModulusOnRegions, pShift=0):
+	n = grid.getNumberOfVertices()
+	for region in grid.getRegions():
+		alpha = biotOnRegions.getValue(region)
+		modulus = bulkModulusOnRegions.getValue(region)
+		delta = deltaOnRegions.getValue(region)
+		for element in region.getElements():
+			bVertex = element.getVertices()[0]
+			fVertex = element.getVertices()[1]
+			bIndex = bVertex.getIndex()
+			fIndex = fVertex.getIndex()
+			value = (alpha*alpha/modulus)*element.getSubVolume()/timeStep/delta
+			linearSystem.addValueToMatrix(bIndex + pShift*n, bIndex + pShift*n, value)
+			linearSystem.addValueToMatrix(fIndex + pShift*n, fIndex + pShift*n, value)
+
+def AssemblyFixedStressAccumulationToVector_2(linearSystem, grid, timeStep, biotOnRegions, deltaOnRegions, bulkModulusOnRegions, p_old, pShift=0):
+	n = grid.getNumberOfVertices()
+	for region in grid.getRegions():
+		alpha = biotOnRegions.getValue(region)
+		modulus = bulkModulusOnRegions.getValue(region)
+		delta = deltaOnRegions.getValue(region)
+		for element in region.getElements():
+			bVertex = element.getVertices()[0]
+			fVertex = element.getVertices()[1]
+			bIndex = bVertex.getIndex()
+			fIndex = fVertex.getIndex()
+			value = (alpha*alpha/modulus)*element.getSubVolume()/timeStep/delta
+			linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, value*p_old.getValue(bVertex))
+			linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, value*p_old.getValue(fVertex))
+
+
 def AssemblyVolumetricStrainToMatrix(linearSystem, grid, timeStep, biotOnRegions, pShift=0):
 	n = grid.getNumberOfVertices()
 	for region in grid.getRegions():
