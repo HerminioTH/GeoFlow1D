@@ -186,6 +186,14 @@ class Grid_1D( object ):
                             name = bound.get("NAME")
                             self.__boundaries.append(Boundary(name, e, v))
 
+    def getVerticesFromRegion(self, region):
+        verticesOnRegion = []
+        for element in region.getElements():
+            for v in element.getVertices():
+                if verticesOnRegion.count(v) == 0:
+                    verticesOnRegion.append(v)
+        return verticesOnRegion
+
     def getVertices( self ):
         return self.__vertices
 
@@ -276,11 +284,8 @@ if __name__ == '__main__':
             R1.append(e)
         elif x > L_0:
             R2.append(e)
-    elemOnRegion1 = gridData.elemConnectivity[R1[0]:R1[-1]+1]
-    elemOnRegion2 = gridData.elemConnectivity[R2[0]:R2[-1]+1]
-    gridData.setElementsToRegions([elemOnRegion1, elemOnRegion2], namesOfRegions)
-    print elemOnRegion1
-    # print gridData.regionNames
+    gridData.setElementsToRegion(R1, namesOfRegions[0])
+    gridData.setElementsToRegion(R2, namesOfRegions[1])
     # -----------------------------------------------------
 
     g = Grid_1D( gridData )
