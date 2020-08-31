@@ -27,7 +27,7 @@ class ScalarField( object ):
     def getValues( self ):
         return self.__listOfValues
 
-    
+
 
 if __name__ == '__main__':
     from GridLib import *
