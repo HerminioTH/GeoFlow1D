@@ -1,0 +1,10 @@
+# Auxiliary files
+*.pyc
+
+# Sublime files
+*.sublime-workspace
+
+# Folders
+Apps/FixedStress_2
+Apps/FixedStress_Varying_Properties
+Apps/TerzaTwoLayers
