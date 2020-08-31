@@ -18,8 +18,8 @@
         "Manual": false,
         "Restart": false,
         "Relaxation": 1.0,
-        "Step": 0.2,
-        "Factor": 2.0,
+        "Step": 0.5,
+        "Factor": 1.5,
         "Media1": 10,
         "Media2": 20
     }

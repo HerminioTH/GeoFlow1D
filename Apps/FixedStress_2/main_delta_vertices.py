@@ -88,7 +88,7 @@ for r in grid.getRegions():
 num_set = getJsonData(folder_settings + "numerical_settings.json")
 initialTime = 0.0
 finalTime = computeDimensionalTime(fluid, solid, L)
-timeStep = finalTime/500.
+timeStep = finalTime/150.
 maxIte = num_set.get("IterativeCycle").get("MaximumNumberOfIterations")
 maxTol = num_set.get("IterativeCycle").get("Tolerance")
 timeHandler = TimeHandler(timeStep, finalTime, initialTime)
@@ -97,20 +97,24 @@ iterativeController = IterativeCycleController(maxIte, maxTol)
 
 # -------------- SPLITTING SETTINGS -------------------
 step = num_set.get("SplitMethod").get("Step")
+method_split = num_set.get("SplitMethod").get("Name")
+manual = num_set.get("SplitMethod").get("Manual")
+
 reductionFactor = num_set.get("SplitMethod").get("Factor")
 mediaMovel1 = num_set.get("SplitMethod").get("Media1")
 mediaMovel2 = num_set.get("SplitMethod").get("Media2")
 d = num_set.get("SplitMethod").get("Relaxation")
-delta = BackForwardStep(d, step, reductionFactor)
-deltaField = ScalarField(grid.getNumberOfVertices(), d)
-method_split = num_set.get("SplitMethod").get("Name")
-manual = num_set.get("SplitMethod").get("Manual")
+optimizer = CellOptimization()
+for i in range(grid.getNumberOfVertices()):
+	optimizer.addOptimizer( BackForwardStep(d, step, reductionFactor) )
+optimizer.initialize()
+deltaField = ScalarField(grid.getNumberOfVertices())
+deltaField.setField(optimizer.deltas)
+
 if method_split == "FIXED_STRESS_D":
 	folder_results += method_split
 	folder_results += "_" + str(step)
 	folder_results += "_" + str(reductionFactor)
-	folder_results += "_" + str(mediaMovel1)
-	folder_results += "_" + str(mediaMovel2)
 	folder_results += "\\"
 else:
 	folder_results += method_split + "\\"
@@ -217,18 +221,19 @@ while timeHandler.isFinalTimeReached():
 		error_list.append(L2_mass)
 		iterativeController.execute(L2_mass)
 
-	rate_vertices_new = np.log10(error_vertices)/iterativeController.iteNumber
+	rate_vertices_new = -np.log10(error_vertices)/iterativeController.iteNumber
 	rate_rate = -(rate_vertices_new - rate_vertices_old)
 	rate_vertices_old = rate_vertices_new
 
 	rate = computeRate(error_list)
+	rate_vertices_new = rate*np.ones(grid.getNumberOfVertices())
 	rates.append(rate)
 
-	print len(error_list), d, rate, rate_rate
+	print len(error_list), deltaField.getField()
+	print len(error_list), rate_vertices_new,'\n'
 
 	if method_split == "FIXED_STRESS_D" and manual == False:
-		d = delta.computeDelta(rate)
-		deltaField = ScalarField(grid.getNumberOfVertices(), d)
+		deltaField.setField(optimizer.optimize(rate_vertices_new))
 
 
 

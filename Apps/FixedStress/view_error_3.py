@@ -124,7 +124,7 @@ def main():
 	nNames = len(names)
 
 	folderName = "results\\"
-	times = [1, 10, 50, 100, 200, -100, -50, -1]
+	times = [0, 1, 10, 50, 100, 200, -100, -50, -1]
 
 	fig = plt.figure(figsize=(21,12))
 	fig.subplots_adjust(left=0.060, right=0.975, top=0.965, bottom=0.08, hspace=0.3)
