@@ -48,8 +48,8 @@ def plotRate(res, ax, fileName):
 	pos = fileName.find("STR")
 	name = fileName[pos+7:-1]
 	# ax.semilogy(res.times, rate, 'o-')
-	ax.plot(res.times, rate, '.-', label=name)
-	ax.set_xlabel("Time [s]", fontsize=fontSize, **fonts)
+	ax.plot(rate, '.-', label=name)
+	ax.set_xlabel("Time level", fontsize=fontSize, **fonts)
 	ax.set_ylabel("Rate", fontsize=fontSize, **fonts)
 	ax.grid(True)
 	ax.legend(loc=0)
@@ -62,9 +62,9 @@ def plotIterations(res, ax, fileName):
 	pos = fileName.find("STR")
 	name = fileName[pos+7:-1]
 	# ax.loglog(res.times, ite, '.-', label=name)
-	ax.semilogy(res.times, ite, '.-', label=name)
+	ax.semilogy(ite, '.-', label=name)
 	# ax.plot(res.times, ite, '.-', label=name)
-	ax.set_xlabel("Time [s]", fontsize=fontSize, **fonts)
+	ax.set_xlabel("Time level", fontsize=fontSize, **fonts)
 	ax.set_ylabel("Number of Iterations", fontsize=fontSize, **fonts)
 	ax.grid(True)
 	ax.legend(loc=0)
@@ -78,8 +78,8 @@ def plotMAXIterations(res, ax, fileName):
 	name = fileName[pos+7:-1]
 	# ax.loglog(res.times, ite[1:], '.-', label=name)
 	# ax.semilogy(res.times, ite[1:], '.-', label=name)
-	ax.plot(res.times, ite[1:], '.-', label=name)
-	ax.set_xlabel("Time [s]", fontsize=fontSize, **fonts)
+	ax.plot(ite[1:], '.-', label=name)
+	ax.set_xlabel("Time level", fontsize=fontSize, **fonts)
 	ax.set_ylabel("Number of Iterations", fontsize=fontSize, **fonts)
 	ax.grid(True)
 	ax.legend(loc=0)
@@ -92,8 +92,8 @@ def plotDeltas(res, ax, fileName):
 	name = fileName[pos+7:-1]
 	# ax.loglog(res.times, ite[1:], '.-', label=name)
 	# ax.semilogy(res.times, ite[1:], '.-', label=name)
-	ax.plot(res.times, deltas, '.-', label=name)
-	ax.set_xlabel("Time [s]", fontsize=fontSize, **fonts)
+	ax.plot( deltas, '.-', label=name)
+	ax.set_xlabel("Time level", fontsize=fontSize, **fonts)
 	ax.set_ylabel("Delta", fontsize=fontSize, **fonts)
 	ax.grid(True)
 	ax.legend(loc=0)
@@ -107,23 +107,12 @@ def plotDeltas(res, ax, fileName):
 
 def main():
 	names = [
-				"Case_10_SC\\FIXED_STRESS_K\\",
-				"Case_10_SC\\FIXED_STRESS_M\\",
-				"Case_10_SC\\FIXED_STRESS_D_noRestart\\",
-				"Case_10_SC\\FIXED_STRESS_D_Restart\\"
-				# "Case_8_WC\\FIXED_STRESS_D_0.2_2.0_10_20_noRestart\\",
-				# "Case_8_WC\\FIXED_STRESS_D_0.2_2.0_10_20_Restart\\",
-				# "Case_9_WC\\FIXED_STRESS_D_0.2_2.0_10_20\\"
-				# "Case_8\\FIXED_STRESS_D_0.2_2.0_3_5\\",
-				# "Case_8\\FIXED_STRESS_D_0.2_2.0_3_5_noRestart\\",
-				# "Case_8\\FIXED_STRESS_D_0.2_2.0_3_5_Restart\\"
-				# "Case_5\\FIXED_STRESS_D_0.2_5.0_100_200\\",
-				# "Case_5\\FIXED_STRESS_D_0.5_5.0_5_10\\",
-				# "Case_5\\FIXED_STRESS_D_0.2_2.0_5_10\\"
+				"TESTE//FIXED_STRESS_D_0.2_2.0_10_20//",
+				"TESTE//FIXED_STRESS_D_0.5_1.5_10_20//"
 			]
 	nNames = len(names)
 
-	folderName = "results\\"
+	folderName = "results//"
 	times = [1, 10, 50, 100, 200, -100, -50, -1]
 
 	fig = plt.figure(figsize=(21,12))
@@ -131,7 +120,7 @@ def main():
 	nCols = 3
 	nRows = nNames
 	gs = gridspec.GridSpec(nRows, nCols)
-	stop = nRows/2
+	stop = int(nRows/2)
 	axIte = fig.add_subplot(gs[stop:,-1])
 	axMAX = fig.add_subplot(gs[:stop,-1])
 	axRATE = fig.add_subplot(gs[stop:,-2])
@@ -143,7 +132,7 @@ def main():
 		res_e = ReadResults(folderName + name + "error.txt")
 		res_d = ReadResults(folderName + name + "delta.txt")
 
-		print i, name, len(res_e.times)
+		print(i, name, len(res_e.times))
 		plotError(res_e, ax1, times, name)
 		# plotRate(res_e, ax2, name)
 		plotRate(res_e, axRATE, name)
@@ -159,6 +148,3 @@ def main():
 
 if __name__ == '__main__':
 	main()
-
-
-

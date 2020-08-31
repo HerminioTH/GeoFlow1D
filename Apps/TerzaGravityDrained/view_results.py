@@ -8,10 +8,10 @@ def getTerza(folderName, H, tao, g):
 	solid = getJsonData(folderName + "properties_solid.json")
 	return Solution(H, tao, solid, fluid, -g)
 
-folderName = "results\\"
+folderName = "results//"
 times = [0, 1, 5, 80, 250, -1]
 # times = [0, 10, 50]
-
+print(folderName + "p.txt")
 res_p = ReadResults(folderName + "p.txt")
 res_u = ReadResults(folderName + "u.txt")
 L = res_p.coord[-1]

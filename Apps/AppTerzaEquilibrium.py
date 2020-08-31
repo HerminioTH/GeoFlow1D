@@ -64,7 +64,7 @@ gridData = GridData()
 gridData.setElementConnectivity( elemConn )
 gridData.setNodeCoordinates( nodesCoord )
 
-print nodesCoord
+print(nodesCoord)
 
 g = Grid_1D( gridData )
 ## -------------------------------------------------------------------
@@ -102,10 +102,10 @@ pressure = ScalarField( g.getNumberOfVertices() )
 displacement = ScalarField( g.getNumberOfVertices() )
 
 equilibriumPressure = pEqui( stress, L, c_f, c_s, phi, poisson, shear, biot )
-print equilibriumPressure,'\n'
+print(equilibriumPressure,'\n')
 
 equilibriumDisplacement = uEqui( stress, L, c_f, c_s, phi, poisson, shear, biot )
-print equilibriumDisplacement,'\n'
+print(equilibriumDisplacement,'\n')
 ## -------------------------------------------------------------------
 
 
@@ -173,7 +173,7 @@ def AssemblyPressureEquation():
 
 
 ## ----------------------- ELASTICITY EQUATION -----------------------
-def AssemblyElasticityEquation():    
+def AssemblyElasticityEquation():
     '''Forces'''
     for e in g.getElements():
         dx = e.getLength()
@@ -232,9 +232,9 @@ ls.applyNeumann( 2*nv-1, stress )
 ## ----------------------------- SOLVER ------------------------------
 sol = ls.solve()
 p, u = splitSolution( sol, g.getNumberOfVertices() )
-print "Numerical Solution:"
-print p[-1],'\n'
-print u[-1]
+print("Numerical Solution:")
+print(p[-1],'\n')
+print(u[-1])
 ## -------------------------------------------------------------------
 
 M = ls.getMatrix()
