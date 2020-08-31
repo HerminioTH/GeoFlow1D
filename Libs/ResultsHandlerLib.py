@@ -39,6 +39,7 @@ class SaveResults( object ):
 
     def copySettings(self, source, destination):
         for file in os.listdir(source):
+            self.__ensure_dir(destination)
             shutil.copyfile(source + file, destination + file)
 
     def saveField(self, currentTime, field):
@@ -95,6 +96,12 @@ class ReadResults(object):
             return self.field[i]
         except:
             raise Exception('Time %f does not exist.'%time)
+
+    def getSolutionAtTimeStep(self, timeStep):
+        try:
+            return self.field[timeStep]
+        except:
+            raise Exception('TimeStep %i does not exist.'%timeStep)
 
 
 

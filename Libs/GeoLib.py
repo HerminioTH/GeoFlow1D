@@ -1,7 +1,7 @@
 def AssemblyStiffnessMatrix(linearSystem, grid, modulus, uShift):
     for region in grid.getRegions():
         value = modulus.getValue(region)
-    	for e in region.getElements():
+        for e in region.getElements():
             dx = e.getLength()
             f = e.getFace()
             bIndex = f.getBackwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
@@ -62,8 +62,8 @@ def AssemblyPorePressureToVector(linearSystem, grid, biot, pField, uShift=0):
 
 
 def AssemblyPorePressureToGeoMatrix(linearSystem, grid, props, uShift):
-	for e in grid.getElements():
-		f = e.getFace()
+    for e in grid.getElements():
+        f = e.getFace()
         A = f.getArea()
         backVertex = f.getBackwardVertex()
         forVertex = f.getForwardVertex()
@@ -77,14 +77,14 @@ def AssemblyPorePressureToGeoMatrix(linearSystem, grid, props, uShift):
             ls.addValueToMatrix( bIndex, vIndex, flux )
             ls.addValueToMatrix( fIndex, vIndex, -flux )
             localIndex += 1
-	ls.addValueToMatrix( 2*nv-1, nv-1, 2*biot*A )
+    ls.addValueToMatrix( 2*nv-1, nv-1, 2*biot*A )
 
 
 
 if __name__ == '__main__':
     from GridLib import *
     from FieldsLib import *
-    from LinearSystem import *
+    from LinearSystemLib import *
 
     L_0 = 4.
     L_1 = 6.
@@ -114,13 +114,13 @@ if __name__ == '__main__':
     g = Grid_1D( gridData )
 
     for region in g.getRegions():
-        print region.getName()
+        print(region.getName())
         for element in region.getElements():
             vec = [element.getIndex()]
             for v in element.getVertices():
                 vec.append(v.getIndex())
-            print vec
-        print '\n'
+            print(vec)
+        print('\n')
     # -----------------------------------------------------
 
     # -------------- PROPERTIES ----------------------------
@@ -134,11 +134,11 @@ if __name__ == '__main__':
     AssemblyStiffnessMatrix(ls, g, M, 0)
     ls.applyDirichlet(0, 0)
     ls.applyNeumann(-1, -1000)
-    print g.getNumberOfVertices()
-    print ls.getMatrix()
-    print ls.getVector()
+    print(g.getNumberOfVertices())
+    print(ls.getMatrix())
+    print(ls.getVector())
     ls.solve()
-    print ls.getSolution()
+    print(ls.getSolution())
     # -----------------------------------------------------
 
 

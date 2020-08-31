@@ -290,10 +290,10 @@ if __name__ == '__main__':
 
     g = Grid_1D( gridData )
     regions = g.getRegions()
-    print regions
+    print(regions)
     for region in g.getRegions():
-        print region.getName()
+        print(region.getName())
         for element in region.getElements():
-            print element.getIndex(), element.getVertices()
-        print '\n'
+            print(element.getIndex(), element.getVertices())
+        print('\n')
 

@@ -58,5 +58,23 @@ def computeMedia(vector, period):
         return v[-1]
 
 def computeRate(error):
-    return (np.log10(error[0]) - np.log10(error[-1]))/len(error)
+    return (np.log10(error[0]) - np.log10(max(1e-200, error[-1])))/len(error)
+    # return - np.log10(error[-1])/len(error)
+
+# def computeRateOnRegions(error, nIte, grid):
+    
+
+def computeNormL2OnRegions(vector, grid):
+    L2 = [[] for i in range(grid.getNumberOfRegions())]
+    for region in grid.getRegions():
+        soma = 0
+        for i,vertex in enumerate(grid.getVerticesFromRegion(region)):
+            soma += vertex.getVolume()*vector[i]*vector[i]
+        L2[region.getIndex()] = soma**0.5
+    return np.array(L2)
+
+
+
+
+
 

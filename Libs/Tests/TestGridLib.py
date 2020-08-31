@@ -1,3 +1,6 @@
+import sys,os
+sys.path.append(os.path.join(os.path.dirname(__file__), os.path.pardir))
+
 import unittest
 from GridLib import *
 
@@ -135,6 +138,27 @@ class Test_Grid(unittest.TestCase):
 		gridData.addBoundary("TOP", 9, self.n-1)
 		gridData.addBoundary("BOTTOM", 0, 0)
 		self.grid = Grid_1D(gridData)
+
+	def test_VerticesOnRegions(self):
+		vertices_region_0 = self.grid.getVerticesFromRegion(self.grid.getRegions()[0])
+		self.assertEqual(vertices_region_0[0].getIndex(), 0)
+		self.assertEqual(vertices_region_0[1].getIndex(), 1)
+		self.assertEqual(vertices_region_0[2].getIndex(), 2)
+		self.assertEqual(vertices_region_0[3].getIndex(), 3)
+		self.assertEqual(vertices_region_0[4].getIndex(), 4)
+
+		vertices_region_1 = self.grid.getVerticesFromRegion(self.grid.getRegions()[1])
+		self.assertEqual(vertices_region_1[0].getIndex(), 4)
+		self.assertEqual(vertices_region_1[1].getIndex(), 5)
+		self.assertEqual(vertices_region_1[2].getIndex(), 6)
+		self.assertEqual(vertices_region_1[3].getIndex(), 7)
+		self.assertEqual(vertices_region_1[4].getIndex(), 8)
+		self.assertEqual(vertices_region_1[5].getIndex(), 9)
+		self.assertEqual(vertices_region_1[6].getIndex(), 10)
+
+	def test_RegionNames(self):
+		self.assertEqual(self.grid.getRegions()[0].getName(), "lower_layer")
+		self.assertEqual(self.grid.getRegions()[1].getName(), "upper_layer")
 
 	def test_Numbers(self):
 		self.assertEqual(self.grid.getNumberOfVertices(), self.n)

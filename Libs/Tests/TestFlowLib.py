@@ -1,3 +1,7 @@
+
+import sys,os
+sys.path.append(os.path.join(os.path.dirname(__file__), os.path.pardir))
+
 import unittest
 from GridLib import *
 from FlowLib import *

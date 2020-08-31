@@ -5,6 +5,7 @@ class ScalarField(object):
         self.__name = name
         self.__unity = unity
         self.__listOfValues = initialValue*np.ones(size)
+        self.teste = 'oi'
 
     def setValue(self, entity, value):
         self.__listOfValues[entity.getIndex()] = value

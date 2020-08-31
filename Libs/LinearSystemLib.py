@@ -110,7 +110,7 @@ class TransientSolutionHandler( object ):
             i = self.__timeList.index(time)
             return self.__solution[i]
         except:
-            print "Time %f do not exist."%time
+            print("Time %f do not exist."%time)
 
     def getPressureAtTime(self, time):
         try:
@@ -119,7 +119,7 @@ class TransientSolutionHandler( object ):
             except: n = len(self.__solution[i])/2
             return self.__solution[i][:n]
         except:
-            print "Time %f do not exist."%time
+            print("Time %f do not exist."%time)
 
     def getDisplacementAtTime(self, time):
         try:
@@ -128,7 +128,7 @@ class TransientSolutionHandler( object ):
             except: n = len( self.__solution[i] )/2
             return self.__solution[i][n:]
         except:
-            print "Time %f do not exist."%time
+            print("Time %f do not exist."%time)
 
     def getSolutionOnIndex(self, index=0):
         return self.__solution[index]
@@ -161,4 +161,4 @@ if __name__ == '__main__':
     s.saveSolution([1,2,3,4])
     s.saveSolution([5,6,7,8])
     s.getSolutionOnTime(9)
-    print s.getSolutionOnTime(5.2)
+    print(s.getSolutionOnTime(5.2))

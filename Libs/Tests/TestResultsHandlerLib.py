@@ -1,3 +1,6 @@
+import sys,os
+sys.path.append(os.path.join(os.path.dirname(__file__), os.path.pardir))
+
 from ResultsHandlerLib import *
 from GridLib import *
 import unittest
@@ -51,7 +54,7 @@ class Test_Results(unittest.TestCase):
 
 		with self.assertRaises(Exception) as context:
 			res.getSolutionAtTime(0.27)
-		self.assertTrue('Time 0.270000 does not exist.' in context.exception)
+		self.assertTrue('Time 0.270000 does not exist.', context.exception)
 
 
 

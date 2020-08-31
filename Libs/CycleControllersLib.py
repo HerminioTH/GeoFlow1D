@@ -29,7 +29,7 @@ class TimeHandler( object ):
             return True
 
     def printCurrentTime(self):
-        print self.__currentTime
+        print(self.__currentTime)
 
 
 class IterativeCycleController(object):
@@ -43,7 +43,7 @@ class IterativeCycleController(object):
         return self.__keepCycle
 
     def printKeepCycle(self):
-        print self.__keepCycle
+        print(self.__keepCycle)
 
     def reset(self):
         self.__keepCycle = True
