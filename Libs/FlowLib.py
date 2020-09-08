@@ -217,3 +217,109 @@ def AssemblyVolumetricStrainToVector2(linearSystem, grid, timeStep, biotOnRegion
 	linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, biotOnRegions.getValue(r)*(u_old.getValue(fVertex) - u_new.getValue(fVertex))/timeStep)
 
 
+
+
+
+
+# ---------------------------- LOOP BY ELEMENTS ----------------------------------
+
+
+def AssemblyBiotAccumulationToMatrix_e(linearSystem, grid, timeStep, biotOnElements, phiOnElements, csOnElements, cf, pShift=0):
+	n = grid.getNumberOfVertices()
+	for element in grid.getElements():
+		phi = phiOnElements.getValue(element)
+		alpha = biotOnElements.getValue(element)
+		cs = csOnElements.getValue(element)
+		bIndex = element.getVertices()[0].getIndex()
+		fIndex = element.getVertices()[1].getIndex()
+		value = (cf*phi + cs*(alpha - phi))*element.getSubVolume()/timeStep
+		linearSystem.addValueToMatrix(bIndex + pShift*n, bIndex + pShift*n, value)
+		linearSystem.addValueToMatrix(fIndex + pShift*n, fIndex + pShift*n, value)
+
+def AssemblyBiotAccumulationToVector_e(linearSystem, grid, timeStep, biotOnElements, phiOnElements, csOnElements, cf, p_old, pShift=0):
+	n = grid.getNumberOfVertices()
+	for element in grid.getElements():
+		phi = phiOnElements.getValue(element)
+		alpha = biotOnElements.getValue(element)
+		cs = csOnElements.getValue(element)
+		bVertex = element.getVertices()[0]
+		fVertex = element.getVertices()[1]
+		value = (cf*phi + cs*(alpha - phi))*element.getSubVolume()/timeStep
+		linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, value*p_old.getValue(bVertex))
+		linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, value*p_old.getValue(fVertex))
+
+def AssemblyFixedStressAccumulationToMatrix_e(linearSystem, grid, timeStep, biotOnElements, deltaOnElements, bulkModulusOnElements, pShift=0):
+	n = grid.getNumberOfVertices()
+	for element in grid.getElements():
+		alpha = biotOnElements.getValue(element)
+		modulus = bulkModulusOnElements.getValue(element)
+		delta = deltaOnElements.getValue(element)
+		bVertex = element.getVertices()[0]
+		fVertex = element.getVertices()[1]
+		bIndex = bVertex.getIndex()
+		fIndex = fVertex.getIndex()
+		value = (alpha*alpha/modulus)*element.getSubVolume()/timeStep/delta
+		linearSystem.addValueToMatrix(bIndex + pShift*n, bIndex + pShift*n, value)
+		linearSystem.addValueToMatrix(fIndex + pShift*n, fIndex + pShift*n, value)
+
+def AssemblyFixedStressAccumulationToVector_e(linearSystem, grid, timeStep, biotOnElements, deltaOnElements, bulkModulusOnElements, p_old, pShift=0):
+	n = grid.getNumberOfVertices()
+	for element in grid.getElements():
+		alpha = biotOnElements.getValue(element)
+		modulus = bulkModulusOnElements.getValue(element)
+		delta = deltaOnElements.getValue(element)
+		bVertex = element.getVertices()[0]
+		fVertex = element.getVertices()[1]
+		bIndex = bVertex.getIndex()
+		fIndex = fVertex.getIndex()
+		value = (alpha*alpha/modulus)*element.getSubVolume()/timeStep/delta
+		linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, value*p_old.getValue(bVertex))
+		linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, value*p_old.getValue(fVertex))
+
+def AssemblyDarcyVelocitiesToMatrix_e(linearSystem, grid, viscosity, permeabilityOnElements, pShift=0):
+	for element in grid.getElements():
+		k = permeabilityOnElements.getValue(element)
+		dx = element.getLength()
+		face = element.getFace()
+		A = face.getArea()
+		backVertex = face.getBackwardVertex()
+		forVertex = face.getForwardVertex()
+		bIndex = backVertex.getIndex() + pShift*grid.getNumberOfVertices()
+		fIndex = forVertex.getIndex() + pShift*grid.getNumberOfVertices()
+		diffusiveOperator = [k*A/viscosity, -k*A/viscosity]
+		for i,v in enumerate(element.getVertices()):
+			flux = diffusiveOperator[i]
+			vIndex = v.getIndex() + pShift*grid.getNumberOfVertices()
+			linearSystem.addValueToMatrix(bIndex, vIndex, +flux/dx)
+			linearSystem.addValueToMatrix(fIndex, vIndex, -flux/dx)
+
+def AssemblyDarcyVelocitiesToVector_e(linearSystem, grid, viscosity, permeabilityOnElements, density, gravity, pShift=0):
+	n = grid.getNumberOfVertices()
+	for element in grid.getElements():
+		k = permeabilityOnElements.getValue(element)
+		dx = element.getLength()
+		face = element.getFace()
+		A = face.getArea()
+		value = k*A*density*gravity/viscosity
+		bIndex = face.getBackwardVertex().getIndex() + pShift*n
+		fIndex = face.getForwardVertex().getIndex() + pShift*n
+		linearSystem.addValueToVector(bIndex, -value)
+		linearSystem.addValueToVector(fIndex,  value)
+
+def AssemblyVolumetricStrainToVector_e(linearSystem, grid, timeStep, biotOnElements, u_old, pShift=0):
+	n = grid.getNumberOfVertices()
+	for element in grid.getElements():
+		value = biotOnElements.getValue(element)/(2*timeStep)
+		bVertex = element.getVertices()[0]
+		fVertex = element.getVertices()[1]
+		ub = u_old.getValue(bVertex)
+		uf = u_old.getValue(fVertex)
+		linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, value*(ub + uf))
+		linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, -value*(ub + uf))
+	e = grid.getElements()[0]
+	bVertex = e.getVertices()[0]
+	linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, -biotOnElements.getValue(e)*u_old.getValue(bVertex)/(1*timeStep))
+
+	e = grid.getElements()[-1]
+	fVertex = e.getVertices()[1]
+	linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, biotOnElements.getValue(e)*u_old.getValue(fVertex)/(1*timeStep))

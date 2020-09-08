@@ -81,6 +81,54 @@ def AssemblyPorePressureToGeoMatrix(linearSystem, grid, props, uShift):
 
 
 
+
+
+
+# ---------------------------- LOOP BY ELEMENTS ----------------------------------
+def AssemblyStiffnessMatrix_e(linearSystem, grid, modulus, uShift):
+    for element in grid.getElements():
+        value = modulus.getValue(element)
+        dx = element.getLength()
+        f = element.getFace()
+        bIndex = f.getBackwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
+        fIndex = f.getForwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
+        forceOperator = [-value/dx, value/dx]
+        localIndex = 0
+        for v in element.getVertices():
+            flux = forceOperator[localIndex]
+            vIndex = v.getIndex() + uShift*grid.getNumberOfVertices()
+            linearSystem.addValueToMatrix( bIndex, vIndex, flux )
+            linearSystem.addValueToMatrix( fIndex, vIndex, -flux )
+            localIndex += 1
+
+def AssemblyGravityToVector_e(linearSystem, grid, densityOnElements, gravity, uShift):
+    for element in grid.getElements():
+        rho = densityOnElements.getValue(element)
+        face = element.getFace()
+        bVertex = face.getBackwardVertex()
+        fVertex = face.getForwardVertex()
+        value = -rho*gravity*element.getSubVolume()
+        linearSystem.addValueToVector(bVertex.getIndex() + uShift*grid.getNumberOfVertices(), value)
+        linearSystem.addValueToVector(fVertex.getIndex() + uShift*grid.getNumberOfVertices(), value)
+
+def AssemblyPorePressureToVector_e(linearSystem, grid, biotOnElements, pField, uShift=0):
+    for element in grid.getElements():
+        alpha = biotOnElements.getValue(element)
+        f = element.getFace()
+        backVertex = f.getBackwardVertex()
+        forVertex = f.getForwardVertex()
+        bIndex = backVertex.getIndex() + uShift*grid.getNumberOfVertices()
+        fIndex = forVertex.getIndex() + uShift*grid.getNumberOfVertices()
+        pBack = pField.getValue(backVertex)
+        pFron = pField.getValue(forVertex)
+        value = alpha/2.
+        linearSystem.addValueToVector(bIndex, value*pBack)
+        linearSystem.addValueToVector(bIndex, value*pFron)
+        linearSystem.addValueToVector(fIndex, -value*pBack)
+        linearSystem.addValueToVector(fIndex, -value*pFron)
+
+
+
 if __name__ == '__main__':
     from GridLib import *
     from FieldsLib import *
@@ -140,5 +188,3 @@ if __name__ == '__main__':
     ls.solve()
     print(ls.getSolution())
     # -----------------------------------------------------
-
-
