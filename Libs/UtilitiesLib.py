@@ -10,6 +10,9 @@ def getJsonData(jsonFile):
     f.close()
     return data
 
+def saveDataToJson(fileName, data):
+    with open(fileName, "w") as jsonFile:
+        json.dump(data, jsonFile, indent=3)
 
 def updateField( fieldOld, fieldArray, grid ):
     for i,vertex in enumerate(grid.getVertices()):
@@ -62,7 +65,7 @@ def computeRate(error):
     # return - np.log10(error[-1])/len(error)
 
 # def computeRateOnRegions(error, nIte, grid):
-    
+
 
 def computeNormL2OnRegions(vector, grid):
     L2 = [[] for i in range(grid.getNumberOfRegions())]
@@ -72,9 +75,3 @@ def computeNormL2OnRegions(vector, grid):
             soma += vertex.getVolume()*vector[i]*vector[i]
         L2[region.getIndex()] = soma**0.5
     return np.array(L2)
-
-
-
-
-
-
