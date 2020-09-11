@@ -447,7 +447,7 @@ class ZigZagSearchRandom(object):
 		if abs(direction_aux - self.direction) > np.pi/2.:
 			self.edgeLength /= self.decreaseFactor
 			self.planeChangeCounter += 1
-			if self.planeChangeCounter > 2:
+			if self.planeChangeCounter > 1:
 				self.changePlane = True
 		else:
 			self.edgeLength = min(self.edgeLength_0, self.edgeLength*self.increaseFactor)
@@ -496,20 +496,20 @@ class MultiDirectionalSearch(object):
 		self.appendToDeltas(d0, d1)
 		return self.deltas[-1]
 
-	# def shoud_I_change_plane(self):
-	# 	if self.searchAlgorithm.changePlane:
-	# 		self.searchAlgorithm.changePlane = False
-	# 		return True
-	# 	else:
-	# 		return False
-
 	def shoud_I_change_plane(self):
-		self.numberOfStepsInPlane += 1
-		if self.numberOfStepsInPlane > self.maxNumberOfStepsInPlane:
-			self.numberOfStepsInPlane = 1
+		if self.searchAlgorithm.changePlane:
+			self.searchAlgorithm.changePlane = False
 			return True
 		else:
 			return False
+
+	# def shoud_I_change_plane(self):
+	# 	self.numberOfStepsInPlane += 1
+	# 	if self.numberOfStepsInPlane > self.maxNumberOfStepsInPlane:
+	# 		self.numberOfStepsInPlane = 1
+	# 		return True
+	# 	else:
+	# 		return False
 
 	def chooseAnotherPlane(self):
 		if self.planeNumber == self.nIntervals-1:
