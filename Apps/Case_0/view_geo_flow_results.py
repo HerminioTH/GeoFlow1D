@@ -8,7 +8,7 @@ def getTerza(folderName, H, tao, g):
 	solid = getJsonData(folderName + "properties_solid.json")
 	return Solution(H, tao, solid, fluid, -g)
 
-folderName = "results\\geo_flow\\"
+folderName = "results/geo_flow/"
 times = [1, 5, 80, 250, -1]
 # times = [0, 10, 50]
 

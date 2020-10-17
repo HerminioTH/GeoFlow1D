@@ -23,8 +23,8 @@ grid = Grid_1D(gridData)
 # -----------------------------------------------------
 
 # ---------------- FOLDER SETTINGS --------------------
-folder_settings = "settings\\"
-folder_results = "results\\geo_flow\\"
+folder_settings = "settings/"
+folder_results = "results/geo_flow/"
 # -----------------------------------------------------
 
 # -------------- NUMERICAL SETTINGS -------------------
@@ -108,7 +108,7 @@ res_p.saveField(timeHandler.getCurrentTime(), p_old.getField())
 res_u.saveField(timeHandler.getCurrentTime(), u_old.getField())
 timeHandler.advanceTime()
 while timeHandler.isFinalTimeReached():
-	print timeHandler.getCurrentTime()
+	print(timeHandler.getCurrentTime())
 	ls.eraseVector()
 
 	# --------------- FLUID FLOW MODEL --------------------
