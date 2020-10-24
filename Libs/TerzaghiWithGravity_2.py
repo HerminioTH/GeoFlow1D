@@ -16,12 +16,12 @@ class Solution( object ):
         self.tao_0 = tao_0;
         self.g = gravity;
 
-        fluidName = fluid.keys()[0]
+        fluidName = list(fluid.keys())[0]
         self.mi = fluid.get(fluidName).get("Viscosity").get("value")
         self.c_f = fluid.get(fluidName).get("Compressibility").get("value")
         self.rho_f = fluid.get(fluidName).get("Density").get("value")
 
-        solidName = rock.keys()[0]
+        solidName = list(rock.keys())[0]
         self.c_s = rock.get(solidName).get("Compressibility").get("value")
         self.permeability = rock.get(solidName).get("Permeability").get("value")
         self.phi = rock.get(solidName).get("Porosity").get("value")
@@ -322,5 +322,3 @@ def uEquilibrium( stress, height, c_f, c_s, phi, ni, G, alpha ):
     lame = 2*G*ni/(1-2*ni)
     Beta = lame*(1-ni)/ni + alpha*alpha/Psi
     return stress*height/Beta
-
-
