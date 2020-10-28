@@ -151,7 +151,7 @@ class ClimbingGoatAlgorithm3(object):
 
 	def computeDelta(self, rate):
 		self.anxious_goat_point = False
-		self.saveFunctionValue(rate)
+		self.__saveFunctionValue(rate)
 		if len(self.rates) < 2:
 			self.__walk()
 			return self.delta
@@ -175,9 +175,6 @@ class ClimbingGoatAlgorithm3(object):
 		if self.n_reverses >= 2:
 			self.__increaseStep()
 			self.anxious_goat_point = True
-
-	def isAngryGoatActive(self):
-		return self.anxious_goat_point
 
 	def __walk(self):
 		self.delta += self.step*self.direction
@@ -203,18 +200,14 @@ class ClimbingGoatAlgorithm3(object):
 	def __saveDelta(self):
 		self.deltas.append(self.delta)
 
-	def saveFunctionValue(self, rate):
-		# if len(self.rates) > 3:
-		# 	self.rates.pop(0)
-		# if len(self.rates) > 2:
-		# 	self.rates = []
+	def __saveFunctionValue(self, rate):
 		self.rates.append(rate)
 
 
 class ClimbingGoatAlgorithm2D(object):
 	def __init__(self, x_0, y_0, step, factor=0.5):
-		self.ls_x = ClimbingGoatAlgorithm3(x_0, step, factor)
-		self.ls_y = ClimbingGoatAlgorithm3(y_0, step, factor)
+		self.cga_x = ClimbingGoatAlgorithm3(x_0, step, factor)
+		self.cga_y = ClimbingGoatAlgorithm3(y_0, step, factor)
 		self.pivot = 'x'
 		self.x_new = x_0
 		self.y_new = y_0
@@ -224,15 +217,15 @@ class ClimbingGoatAlgorithm2D(object):
 		if self.pivot == 'x':
 			self.pivot = 'y'
 			if self.firstCall:
-				self.ls_y.saveFunctionValue(f)
+				self.cga_y.saveFunctionValue(f)
 			self.firstCall = True
-			self.x_new = self.ls_x.computeDelta(f)
-			self.y_new = self.ls_y.delta
+			self.x_new = self.cga_x.computeDelta(f)
+			self.y_new = self.cga_y.delta
 		else:
 			self.pivot = 'x'
-			self.ls_x.saveFunctionValue(f)
-			self.x_new = self.ls_x.delta
-			self.y_new = self.ls_y.computeDelta(f)
+			self.cga_x.saveFunctionValue(f)
+			self.x_new = self.cga_x.delta
+			self.y_new = self.cga_y.computeDelta(f)
 		return self.x_new, self.y_new
 
 
@@ -550,3 +543,61 @@ class MultiDirectionalSearch(object):
 
 	def initializeStates(self):
 		self.states = [self.searchAlgorithm.getState() for i in range(self.nIntervals)]
+
+
+if __name__ == '__main__':
+	import matplotlib.pyplot as plt
+
+	d1 = d2 = 0.
+	step = 1.
+	direction_deg = 90
+	span_deg = 30
+	reductionFactor = 1.
+	increaseFactor = 1.
+	ls = ZigZagSearch(d1, d2, step, direction_deg, span_deg, reductionFactor, increaseFactor)
+
+	rates = [0, 5, 0, 5, 0, 5, 0, 5]
+	for r in rates:
+		ls.compute(r)
+
+	print('x', ls.x)
+	print('y', ls.y)
+
+
+
+
+	fig, ax = plt.subplots(figsize=(8,8))
+	ax.plot(ls.x, ls.y, '-', linewidth=2.0, zorder=1)
+	# ax.grid(True, zorder=0)
+	ax.set_aspect('equal')
+	ax.set_xlabel(r'$\delta_1$', fontsize=14)
+	ax.set_ylabel(r'$\delta_2$', fontsize=14)
+
+	# for i in range(0, len(ls.x)-2, 2):
+	# 	x = [ls.x[i], ls.x[i+2]]
+	# 	y = [ls.y[i], ls.y[i+2]]
+	# 	ax.plot(x, y, '--', color='0.5', linewidth=2.0, zorder=0)
+
+	for i in range(0, len(ls.x)-2, 2):
+		x = ls.x[i]
+		y = ls.y[i]
+		dx = 0.9*(ls.x[i+2] - ls.x[i])
+		dy = 0.9*(ls.y[i+2] - ls.y[i])
+		ax.arrow(x, y, dx, dy, width=0.03, color='0.5')
+
+	step_number = 1
+	for i in range(0, len(ls.x)-1, 2):
+		x_avg = (ls.x[i+0] + ls.x[i+1] + ls.x[i+2]) / 3
+		y_avg = (ls.y[i+0] + ls.y[i+1] + ls.y[i+2]) / 3
+		ax.text(x_avg, y_avg, 'Step %s'%step_number, horizontalalignment='center', verticalalignment='center', fontsize=14)
+		step_number += 1
+
+	for i in range(len(ls.x)-1):
+		x = ls.x[i]
+		y = ls.y[i]
+		circle = plt.Circle((x, y), 0.08, color='0.2')
+		ax.add_artist(circle)
+		ax.text(x, y, rates[i], horizontalalignment='center', verticalalignment='center', color='white', fontsize=14)
+
+
+	plt.show()
