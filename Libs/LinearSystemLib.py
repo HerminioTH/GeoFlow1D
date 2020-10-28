@@ -6,6 +6,7 @@ class LinearSystem(object):
         self.__size = size
         self.__matrix = np.zeros((size, size))
         self.__vector = np.zeros(size)
+        self.__solution = np.zeros(size)
 
     def addValueToMatrix(self, row, col, value):
         self.__matrix[row][col] += value
