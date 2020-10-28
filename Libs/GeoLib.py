@@ -1,4 +1,4 @@
-def AssemblyStiffnessMatrix(linearSystem, grid, modulus, uShift):
+def AssemblyStiffnessMatrix(linearSystem, grid, modulus, uShift=0):
     for region in grid.getRegions():
         value = modulus.getValue(region)
         for e in region.getElements():
@@ -15,7 +15,7 @@ def AssemblyStiffnessMatrix(linearSystem, grid, modulus, uShift):
                 linearSystem.addValueToMatrix( fIndex, vIndex, -flux )
                 localIndex += 1
 
-def AssemblyGravityToVector(linearSystem, grid, density, gravity, uShift):
+def AssemblyGravityToVector(linearSystem, grid, density, gravity, uShift=0):
     n = grid.getNumberOfVertices()
     for region in grid.getRegions():
         rho = density.getValue(region)
@@ -27,7 +27,7 @@ def AssemblyGravityToVector(linearSystem, grid, density, gravity, uShift):
             linearSystem.addValueToVector(bVertex.getIndex() + uShift*n, value)
             linearSystem.addValueToVector(fVertex.getIndex() + uShift*n, value)
 
-def AssemblyPorePressureToMatrix(linearSystem, grid, biot, uShift):
+def AssemblyPorePressureToMatrix(linearSystem, grid, biot, uShift=0):
     for region in grid.getRegions():
         alpha = biot.getValue(region)
         for e in region.getElements():
@@ -61,7 +61,7 @@ def AssemblyPorePressureToVector(linearSystem, grid, biot, pField, uShift=0):
             linearSystem.addValueToVector(fIndex, -value*pFron)
 
 
-def AssemblyPorePressureToGeoMatrix(linearSystem, grid, props, uShift):
+def AssemblyPorePressureToGeoMatrix(linearSystem, grid, props, uShift=0):
     for e in grid.getElements():
         f = e.getFace()
         A = f.getArea()
@@ -80,12 +80,46 @@ def AssemblyPorePressureToGeoMatrix(linearSystem, grid, props, uShift):
     ls.addValueToMatrix( 2*nv-1, nv-1, 2*biot*A )
 
 
+# ---------------------------- PHYSICAL INFLUENCE SCHEME ----------------------------------
+def AssemblyPisToGeoMatrix(linearSystem, grid, biotOnRegions, permeabilityOnRegions, modulusOnRegions, viscosity, timeStep, uShift=0):
+    for region in grid.getRegions():
+        M = modulusOnRegions.getValue(region)
+        alpha = biotOnRegions.getValue(region)
+        k = permeabilityOnRegions.getValue(region)
+        for e in region.getElements():
+            f = e.getFace()
+            bIndex = f.getBackwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
+            fIndex = f.getForwardVertex().getIndex() + uShift*grid.getNumberOfVertices()
+            dx = e.getLength()
+            value = viscosity*dx*alpha*alpha/(8*k*timeStep)
+            pisOperator = [-value, value]
+            for localIndex, v in enumerate(e.getVertices()):
+                coef = pisOperator[localIndex]
+                vIndex = v.getIndex() + uShift*grid.getNumberOfVertices()
+                linearSystem.addValueToMatrix( bIndex, vIndex, coef )
+                linearSystem.addValueToMatrix( fIndex, vIndex, -coef )
 
+def AssemblyPisToGeoVector(linearSystem, grid, biotOnRegions, permeabilityOnRegions, modulusOnRegions, viscosity, timeStep, uOldField, uShift=0):
+    for region in grid.getRegions():
+        M = modulusOnRegions.getValue(region)
+        alpha = biotOnRegions.getValue(region)
+        k = permeabilityOnRegions.getValue(region)
+        for e in region.getElements():
+            f = e.getFace()
+            dx = e.getLength()
+            value = viscosity*dx*alpha*alpha/(8*k*timeStep)
+            bVertex = f.getBackwardVertex()
+            fVertex = f.getForwardVertex()
+            ub = uOldField.getValue(bVertex)
+            uf = uOldField.getValue(fVertex)
+            linearSystem.addValueToVector(bVertex.getIndex() + uShift*grid.getNumberOfVertices(),  value*(uf - ub))
+            linearSystem.addValueToVector(fVertex.getIndex() + uShift*grid.getNumberOfVertices(), -value*(uf - ub))
+# ------------------------------------------------------------------------------------------
 
 
 
 # ---------------------------- LOOP BY ELEMENTS ----------------------------------
-def AssemblyStiffnessMatrix_e(linearSystem, grid, modulus, uShift):
+def AssemblyStiffnessMatrix_e(linearSystem, grid, modulus, uShift=0):
     for element in grid.getElements():
         value = modulus.getValue(element)
         dx = element.getLength()
@@ -101,7 +135,7 @@ def AssemblyStiffnessMatrix_e(linearSystem, grid, modulus, uShift):
             linearSystem.addValueToMatrix( fIndex, vIndex, -flux )
             localIndex += 1
 
-def AssemblyGravityToVector_e(linearSystem, grid, densityOnElements, gravity, uShift):
+def AssemblyGravityToVector_e(linearSystem, grid, densityOnElements, gravity, uShift=0):
     for element in grid.getElements():
         rho = densityOnElements.getValue(element)
         face = element.getFace()
