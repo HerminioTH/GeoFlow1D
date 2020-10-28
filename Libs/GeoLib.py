@@ -81,7 +81,7 @@ def AssemblyPorePressureToGeoMatrix(linearSystem, grid, props, uShift=0):
 
 
 # ---------------------------- PHYSICAL INFLUENCE SCHEME ----------------------------------
-def AssemblyPisToGeoMatrix(linearSystem, grid, biotOnRegions, permeabilityOnRegions, modulusOnRegions, viscosity, timeStep, uShift=0):
+def AssemblyPisToGeoMatrix_v1(linearSystem, grid, biotOnRegions, permeabilityOnRegions, modulusOnRegions, viscosity, timeStep, uShift=0):
     for region in grid.getRegions():
         M = modulusOnRegions.getValue(region)
         alpha = biotOnRegions.getValue(region)
@@ -99,7 +99,7 @@ def AssemblyPisToGeoMatrix(linearSystem, grid, biotOnRegions, permeabilityOnRegi
                 linearSystem.addValueToMatrix( bIndex, vIndex, coef )
                 linearSystem.addValueToMatrix( fIndex, vIndex, -coef )
 
-def AssemblyPisToGeoVector(linearSystem, grid, biotOnRegions, permeabilityOnRegions, modulusOnRegions, viscosity, timeStep, uOldField, uShift=0):
+def AssemblyPisToGeoVector_v1(linearSystem, grid, biotOnRegions, permeabilityOnRegions, modulusOnRegions, viscosity, timeStep, uOldField, uShift=0):
     for region in grid.getRegions():
         M = modulusOnRegions.getValue(region)
         alpha = biotOnRegions.getValue(region)
