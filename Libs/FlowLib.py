@@ -33,47 +33,6 @@ def AssemblyDarcyVelocitiesToVector(linearSystem, grid, viscosity, permeability,
 			linearSystem.addValueToVector(fIndex,  value)
 
 
-def AssemblyPisTermsToMatrix(linearSystem, grid, biotOnRegions, modulusOnRegions, timeStep, pShift=0):
-	for region in grid.getRegions():
-		M = modulusOnRegions.getValue(region)
-		alpha = biotOnRegions.getValue(region)
-		for elem in region.getElements():
-			dx = elem.getLength()
-			face = elem.getFace()
-			A = face.getArea()
-			backVertex = face.getBackwardVertex()
-			forVertex = face.getForwardVertex()
-			bIndex = backVertex.getIndex() + pShift*grid.getNumberOfVertices()
-			fIndex = forVertex.getIndex() + pShift*grid.getNumberOfVertices()
-			value = alpha*alpha*dx*A/(8*M*timeStep)
-			diffusiveOperator = [value, -value]
-			for i,v in enumerate(elem.getVertices()):
-				flux = diffusiveOperator[i]
-				vIndex = v.getIndex() + pShift*grid.getNumberOfVertices()
-				linearSystem.addValueToMatrix(bIndex, vIndex, +flux/dx)
-				linearSystem.addValueToMatrix(fIndex, vIndex, -flux/dx)
-
-
-def AssemblyPisTermsToVector(linearSystem, biotOnRegions, modulusOnRegions, timeStep, p_old, pShift=0):
-	n = grid.getNumberOfVertices()
-	for region in grid.getRegions():
-		M = modulusOnRegions.getValue(region)
-		alpha = biotOnRegions.getValue(region)
-		for e in region.getElements():
-			dx = elem.getLength()
-			face = elem.getFace()
-			A = face.getArea()
-			bVertex = face.getBackwardVertex()
-			fVertex = face.getForwardVertex()
-			pb = p_old.getValue(bVertex)
-			pf = p_old.getValue(fVertex)
-			value = -alpha*alpha*dx*A/(8*M*timeStep)
-			linearSystem.addValueToVector(bVertex.getIndex() + pShift*n, value*(pf - pb))
-			linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, -value*(pf - pb))
-
-
-
-
 def AssemblyFluidFlowAccumulationToMatrix(linearSystem, grid, timeStep, phiOnRegions, csOnRegions, cf, pShift=0):
 	n = grid.getNumberOfVertices()
 	for region in grid.getRegions():
@@ -259,6 +218,52 @@ def AssemblyVolumetricStrainToVector2(linearSystem, grid, timeStep, biotOnRegion
 	linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, biotOnRegions.getValue(r)*(u_old.getValue(fVertex) - u_new.getValue(fVertex))/timeStep)
 
 
+
+
+
+
+
+# ---------------------------- PHYSICAL INFLUENCE SCHEME ----------------------------------
+
+def AssemblyPisToMassMatrix(linearSystem, grid, biotOnRegions, modulusOnRegions, timeStep, pShift=0):
+	for region in grid.getRegions():
+		M = modulusOnRegions.getValue(region)
+		alpha = biotOnRegions.getValue(region)
+		for elem in region.getElements():
+			dx = elem.getLength()
+			face = elem.getFace()
+			A = face.getArea()
+			backVertex = face.getBackwardVertex()
+			forVertex = face.getForwardVertex()
+			bIndex = backVertex.getIndex() + pShift*grid.getNumberOfVertices()
+			fIndex = forVertex.getIndex() + pShift*grid.getNumberOfVertices()
+			value = alpha*alpha*dx*A/(8*M*timeStep)
+			diffusiveOperator = [value, -value]
+			for i,v in enumerate(elem.getVertices()):
+				coef = diffusiveOperator[i]
+				vIndex = v.getIndex() + pShift*grid.getNumberOfVertices()
+				linearSystem.addValueToMatrix(bIndex, vIndex, +coef)
+				linearSystem.addValueToMatrix(fIndex, vIndex, -coef)
+
+
+def AssemblyPisToMassVector(linearSystem, grid, biotOnRegions, modulusOnRegions, timeStep, p_old, pShift=0):
+	n = grid.getNumberOfVertices()
+	for region in grid.getRegions():
+		M = modulusOnRegions.getValue(region)
+		alpha = biotOnRegions.getValue(region)
+		for e in region.getElements():
+			dx = e.getLength()
+			face = e.getFace()
+			A = face.getArea()
+			bVertex = face.getBackwardVertex()
+			fVertex = face.getForwardVertex()
+			pb = p_old.getValue(bVertex)
+			pf = p_old.getValue(fVertex)
+			value = -alpha*alpha*dx*A/(8*M*timeStep)
+			linearSystem.addValueToVector(bVertex.getIndex() + pShift*n,  value*(pf - pb))
+			linearSystem.addValueToVector(fVertex.getIndex() + pShift*n, -value*(pf - pb))
+
+# ------------------------------------------------------------------------------------------
 
 
 
