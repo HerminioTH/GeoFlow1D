@@ -157,32 +157,31 @@ def AssemblyPisFullToPorePressureMatrix(linearSystem, grid, props, timeStep, uSh
             bIndex = backVertex.getIndex() + uShift*grid.getNumberOfVertices()
             fIndex = forVertex.getIndex() + uShift*grid.getNumberOfVertices()
             A = props.mu*dx*dx/(8*k*Q*timeStep)
-            print(A)
-            operator = [-alpha/2/(1 + A), -alpha/2/(1 + A)]
+            operator = [-alpha/(2*(1 + A)), -alpha/(2*(1 + A))]
             for i,v in enumerate(e.getVertices()):
                 flux = operator[i]
                 col = v.getIndex() + (1-uShift)*grid.getNumberOfVertices()
                 linearSystem.addValueToMatrix( bIndex, col, flux )
                 linearSystem.addValueToMatrix( fIndex, col, -flux )
 
-def AssemblyPisFullToPorePressureVector(linearSystem, grid, props, pField, uShift=0):
+def AssemblyPisFullToPorePressureVector(linearSystem, grid, props, timeStep, pFaces, uShift=0):
     for region in grid.getRegions():
         alpha = props.biot.getValue(region)
         k = props.k.getValue(region)
         Q = 1/(props.c_f*props.phi.getValue(region) + props.c_s.getValue(region)*(1 - props.phi.getValue(region)))
         for e in region.getElements():
+            dx = e.getLength()
             f = e.getFace()
+            A = props.mu*dx*dx/(8*k*Q*timeStep)
             backVertex = f.getBackwardVertex()
             forVertex = f.getForwardVertex()
             bIndex = backVertex.getIndex() + uShift*grid.getNumberOfVertices()
             fIndex = forVertex.getIndex() + uShift*grid.getNumberOfVertices()
-            pBack = pField.getValue(backVertex)
-            pFron = pField.getValue(forVertex)
-            value = alpha/2.
-            linearSystem.addValueToVector(bIndex, value*pBack)
-            linearSystem.addValueToVector(bIndex, value*pFron)
-            linearSystem.addValueToVector(fIndex, -value*pBack)
-            linearSystem.addValueToVector(fIndex, -value*pFron)
+            pFace = pFaces.getValue(e)
+            value = alpha*A/(1 + A)
+            linearSystem.addValueToVector(bIndex, value*pFace)
+            linearSystem.addValueToVector(fIndex, -value*pFace)
+
 # ------------------------------------------------------------------------------------------
 
 

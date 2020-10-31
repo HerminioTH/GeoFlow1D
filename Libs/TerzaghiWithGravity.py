@@ -152,15 +152,7 @@ class Solution( object ):
               - (self.tao_0 + 0.5*self.rho*self.g*self.height)*yPosition / Mu
         return v_0
 
-    # def getPositionValues( self, n = 200, axisName = None ):
-    #     return self.getPositionValues(n)
 
-    # def getPositionValues( self, ny = 200 ):
-    #     dy = self.height / ( ny - 1.0 );
-    #     positionValues = [];
-    #     for i in range( 0, ny ):
-    #         positionValues.append( i * dy );
-    #     return np.array(positionValues)
 
     def getPositionValues(self, n=200):
         return np.linspace(0, self.height, n)
@@ -196,9 +188,6 @@ class Solution( object ):
                                          ( 4.0 * ( self.height ** 2.0 ) ) ) ) )
                 term_3 = math.cos( ( math.pi * position * ( 2.0 * j + 1.0 ) ) / ( 2 * self.height ) )
                 summationResult += term_1 * term_2 * term_3
-            # barP0 = self.alpha * self.Q / ( self.M + self.alpha * self.alpha * self.Q ) * \
-            #     ( self.tao_0 + 0.5 * self.rho * self.g * self.height ) - self.rho_f * self.g * \
-            #     ( 0.5 * self.height );
             barP0 = self._calculate_p_0(self.height)
             displacementValue = 8.0 * self.alpha * self.height * barP0 * summationResult / \
                 ( math.pi * math.pi * self.M )
@@ -270,5 +259,3 @@ def uEquilibrium( stress, height, c_f, c_s, phi, ni, G, alpha ):
     lame = 2*G*ni/(1-2*ni)
     Beta = lame*(1-ni)/ni + alpha*alpha/Psi
     return stress*height/Beta
-
-
